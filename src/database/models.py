@@ -3,8 +3,6 @@ from sqlalchemy import Column, Integer, Float, String, Boolean, func, Table, Enu
 from enum import Enum
 import enum
 
-from sqlalchemy import Column, Integer, Float, String, Boolean, func, Table, Enum
-
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.sql.sqltypes import DateTime
