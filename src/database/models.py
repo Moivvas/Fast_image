@@ -71,6 +71,7 @@ class User(Base):
     forbidden = Column(Boolean, default=False)
     role = Column('role', Enum(Role), default=Role.user)
     images = relationship('Image', backref="users")
+    avatar = Column(String(255), nullable=True)
 
 
 class Token(Base):
