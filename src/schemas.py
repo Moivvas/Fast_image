@@ -26,3 +26,12 @@ class TokenModel(BaseModel):
     refresh_token: str
     token_type: str = "bearer"
 
+
+class TagModel(BaseModel):
+    tag_name: str
+
+
+class TagResponse(TagModel):
+    model_config = SettingsConfigDict(from_attributes=True)
+    id: int
+    tag_name: str
