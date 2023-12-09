@@ -6,7 +6,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from src.conf.config import settings
 
 
-
 URI = settings.sqlalchemy_database_url
 
 engine = create_engine(URI, echo=True)
