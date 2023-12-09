@@ -1,7 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
     sqlalchemy_database_url: str = 'postgresql+psycopg2://user:password@localhost:5432/postgres'
@@ -17,7 +16,5 @@ class Settings(BaseSettings):
     cloudinary_api_key: int = '12903053'
     cloudinary_api_secret: str = 'secret'
    
-
-
 
 settings = Settings()

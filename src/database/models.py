@@ -1,12 +1,12 @@
 
 from sqlalchemy import Column, Integer, Float, String, Boolean, func, Table, Enum
-from enum import Enum
 import enum
 
-from sqlalchemy.orm import relationship
+
+from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.sql.sqltypes import DateTime
-from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy.ext.declarative import declarative_base
 from typing import List
 
 Base = declarative_base()
