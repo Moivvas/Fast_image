@@ -38,7 +38,7 @@ async def get_tag_by_name(tag_name: str, db: Session = Depends(get_db)) -> Tag |
     return tag
 
 
-@router.get("/tags", response_model=List[TagResponse])
+@router.get("/", response_model=List[TagResponse])
 async def get_all_tags(db: Session = Depends(get_db)) -> List[Tag] | None:
     tags = await repo_tags.get_tags(db)
     return tags

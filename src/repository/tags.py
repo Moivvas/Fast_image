@@ -30,9 +30,8 @@ async def get_tags(db: Session) -> List[Type[Tag]]:
 
 
 async def update_tag(tag_id: int, body:TagModel, db: Session) -> Tag | None:
-    # tag = db.query(Tag).filter(Tag.id == tag_id).first()
     tag = await get_tag_by_id(tag_id, db)
-    if tag and tag.id == tag_id:
+    if tag:
         tag_new = db.query(Tag).filter(Tag.tag_name == body.tag_name.lower())
         if tag_new:
             return None
@@ -42,9 +41,8 @@ async def update_tag(tag_id: int, body:TagModel, db: Session) -> Tag | None:
 
 
 async def remove_tag_by_id(tag_id: int, db: Session) -> Tag | None:
-    # tag = db.query(Tag).filter(Tag.id == tag_id).first()
     tag = await get_tag_by_id(tag_id, db)
-    if tag and tag.id == tag_id:
+    if tag:
         db.delete(tag)
         db.commit()
     return tag
@@ -52,7 +50,7 @@ async def remove_tag_by_id(tag_id: int, db: Session) -> Tag | None:
 
 async def remove_tag_by_name(tag_name: str, db: Session) -> Tag | None:
     tag = await get_tag_by_name(tag_name, db)
-    if tag and tag.tag_name == tag_name: 
+    if tag: 
         db.delete(tag)
         db.commit()
     return tag
