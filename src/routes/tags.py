@@ -52,17 +52,13 @@ async def update_tag(tag_id: int, body: TagModel, db: Session = Depends(get_db))
     return tag
 
 
-@router.delete("/del_by_id/{tag_id}", response_model=TagResponse)
-async def delete_tag_by_id(tag_id: int, db: Session = Depends(get_db)) -> Tag | None:
-    tag = await repo_tags.remove_tag_by_id(tag_id, db)
-    if tag is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found")
-    return tag
+@router.delete("/", response_model=TagResponse)
+async def delete_tag(identifier: str, by_id: bool = False, db: Session = Depends(get_db)) -> Tag | None:
+    if by_id:
+        tag = await repo_tags.remove_tag_by_id(int(identifier), db)
+    else:
+        tag = await repo_tags.remove_tag_by_name(identifier, db)
 
-
-@router.delete("/del_by_name/{tag_name}", response_model=TagResponse)
-async def delete_tag_by_name(tag_name: str, db: Session = Depends(get_db)) -> Tag | None:
-    tag = await repo_tags.remove_tag_by_name(tag_name, db)
     if tag is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found")
     return tag
