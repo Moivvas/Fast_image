@@ -2,7 +2,7 @@ from typing import Type
 
 from sqlalchemy.orm import Session
 from src.database.models import User
-from src.schemas import UserModel
+from src.schemas import UserModel, ChangeRoleRequest
 
 
 async def get_users(db: Session) -> list[Type[User]]:
@@ -34,4 +34,31 @@ async def update_avatar(email, url: str, db: Session) -> User:
     user = await get_user_by_email(email, db)
     user.avatar = url
     db.commit()
+    return user
+
+
+async def ban_user(email: str, db: Session) -> User | None:
+    user = await get_user_by_email(email, db)
+    if user:
+        user.forbidden = True
+        db.commit()
+        db.refresh(user)
+    return user
+
+
+async def unban_user(email: str, db: Session) -> User | None:
+    user = await get_user_by_email(email, db)
+    if user:
+        user.forbidden = False
+        db.commit()
+        db.refresh(user)
+    return user
+
+
+async def change_user_role(body: ChangeRoleRequest, db: Session) -> User | None:
+    user = await get_user_by_email(body.email, db)
+    if user:
+        user.role = body.role
+        db.commit()
+        db.refresh(user)
     return user

@@ -1,4 +1,5 @@
 import pickle
+import redis.asyncio as redis
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -18,7 +19,8 @@ class Auth:
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     SECRET_KEY = settings.secret_key
     ALGORITHM = settings.algorithm
-    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/hw11/auth/login")
+    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/project/auth/login")
+    redis_db = redis.Redis(host=settings.redis_host, port=settings.redis_port, db=0)
 
     def verify_password(self, plain_password, hashed_password):
         return self.pwd_context.verify(plain_password, hashed_password)
@@ -78,6 +80,15 @@ class Auth:
                 detail="Could not validate credentials",
             )
 
+    async def ban_token(self, access_token):
+        await self.redis_db.setex(access_token, 3600, access_token)
+
+    async def banned_token(self, access_token):
+        token = await self.redis_db.get(access_token)
+        if token:
+            return True
+        return False
+
     async def get_current_user(
         self, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
     ):
@@ -88,6 +99,9 @@ class Auth:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+        banned_token = await self.banned_token(token)
+        if banned_token:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User is not authorized")
         try:
             payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
             if payload["scope"] == "access_token":
