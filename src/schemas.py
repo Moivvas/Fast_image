@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from datetime import date
 
 from pydantic_settings import SettingsConfigDict
@@ -18,7 +18,8 @@ class UserResponse(BaseModel):
     name: str
     email: str
     role: Role
-    avatar: str
+    avatar: str | None
+    forbidden: bool
 
 
 class TokenModel(BaseModel):
@@ -35,3 +36,18 @@ class TagResponse(TagModel):
     model_config = SettingsConfigDict(from_attributes=True)
     id: int
     tag_name: str
+
+
+class ChangeRoleRequest(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
+    email: EmailStr
+    role: str
+
+    @field_validator("role")
+    def validate_role(cls, v):
+        allowed_roles = {"admin", "user", "moderator"}
+        if v not in allowed_roles:
+            raise ValueError(
+                f"Invalid role. Allowed roles are: {', '.join(allowed_roles)}"
+            )
+        return v
