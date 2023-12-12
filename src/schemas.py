@@ -51,3 +51,8 @@ class ChangeRoleRequest(BaseModel):
                 f"Invalid role. Allowed roles are: {', '.join(allowed_roles)}"
             )
         return v
+
+
+class Rating(BaseModel):
+    image_id: int
+    rating: float

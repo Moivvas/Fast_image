@@ -1,7 +1,7 @@
 import pickle
 import redis.asyncio as redis
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Union
 
 
 from fastapi import Depends, HTTPException, status
@@ -13,6 +13,7 @@ from jose import JWTError, jwt
 from src.database.db import get_db
 from src.repository import users as repository_users
 from src.conf.config import settings
+from src.database.models import User
 
 
 class Auth:
@@ -91,7 +92,7 @@ class Auth:
 
     async def get_current_user(
         self, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
-    ):
+    ) -> Union[User, HTTPException]:
 
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

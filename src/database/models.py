@@ -27,6 +27,9 @@ class Image(Base):
     url = Column(String(255), nullable=False)
     public_id = Column(String(150))
     image_name = Column(String(150))
+    rating = Column(Float)
+    total_rating = Column(Integer, default=0)
+    average_rating = Column(Float, default=0.0)
     
     description = Column(String(150))
     user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
