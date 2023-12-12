@@ -31,7 +31,7 @@ class CloudImage:
         return src_url
     
     
-    def delete_img(public_id: str):
+    def delete_img(self, public_id: str):
         
         cloudinary.uploader.destroy(public_id, **any)
         return f'{public_id} deleted'
