@@ -30,10 +30,10 @@ class CloudImage:
             .build_url(width=250, height=250, crop='fill', version=upload_file.get('version'))
         return src_url
     
-    @staticmethod
-    def delete_image(self, public_id: str):
+    
+    def delete_img(public_id: str):
         
-        cloudinary.uploader.destroy(public_id)
+        cloudinary.uploader.destroy(public_id, **any)
         return f'{public_id} deleted'
     
 image_cloudinary = CloudImage()

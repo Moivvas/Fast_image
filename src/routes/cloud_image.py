@@ -5,7 +5,7 @@ from src.database.models import User
 from src.database.db import get_db
 
 from src.services.auth import auth_service
-from src.services.cloud_images import CloudImage
+from src.services.cloud_images_service import CloudImage
 
 from src.schemas import ImageDeleteResponse, ImageModel
 
@@ -28,9 +28,9 @@ async def upload_image(
     image = await repository_image.add_image(db, src_url, public_id, current_user)
     return image
 
-@router.delete("/", response_model=ImageDeleteResponse, dependencies=[Depends(all_roles)])
+@router.delete("/{id}", response_model=ImageDeleteResponse, dependencies=[Depends(all_roles)])
 async def delete_image(id: int, db: Session = Depends(get_db), 
                        current_user: User = Depends(auth_service.get_current_user)):
    
-    db_image = await repository_image.delete_image(db, id, current_user)
+    db_image = await repository_image.delete_image(db, id)
     return db_image
