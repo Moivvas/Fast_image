@@ -12,11 +12,11 @@ router = APIRouter(prefix="/tags", tags=["tags"])
 
 
 @router.post('/', response_model=TagResponse)
-async def create_tag(body:TagModel, db: Session = Depends(get_db)) -> Tag | None:
+async def create_tag(body: TagModel, db: Session = Depends(get_db)) -> Tag | None:
     tag_exist = await repo_tags.get_tag_by_name(body.tag_name.lower(), db)
     if tag_exist:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='The tag already exist')
-    tag =  await repo_tags.create_tag(body, db)
+    tag = await repo_tags.create_tag(body, db)
     if tag is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
     return tag
