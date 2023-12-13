@@ -49,4 +49,3 @@ def client(session):
 def user():
 
     return {"name": "deadpool", "email": "deadpool@example.com", "password": "123456789", "id": 1}
-
