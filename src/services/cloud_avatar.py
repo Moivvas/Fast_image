@@ -6,7 +6,7 @@ import cloudinary.uploader
 from src.conf.config import settings
 
 
-class CloudImage:
+class CloudAvatar:
     cloudinary.config(
         cloud_name=settings.cloudinary_name,
         api_key=settings.cloudinary_api_key,
@@ -20,7 +20,7 @@ class CloudImage:
         return f"fast_image/{name}"
 
     @staticmethod
-    def upload(file, public_id: str) -> dict:
+    def upload_avatar(file, public_id: str) -> dict:
         r = cloudinary.uploader.upload(file, public_id=public_id, overwrite=True)
         return r
 
