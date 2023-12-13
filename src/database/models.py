@@ -27,7 +27,6 @@ class Image(Base):
     url = Column(String(255), nullable=False)
     public_id = Column(String(150))
     image_name = Column(String(150))
-    
     description = Column(String(150))
     user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
     tags = relationship("Tag", secondary=image_m2m_tag, back_populates="images")
