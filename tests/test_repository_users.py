@@ -7,12 +7,13 @@ from src.database.models import User
 
 from src.schemas import UserModel
 
-from src.repository.users import get_users, get_user_by_email, create_user, update_token
+from src.repository.users import get_users, get_user_by_email, create_user, update_token, update_avatar, ban_user, unban_user
 
 
 class TestUsersRepository(unittest.IsolatedAsyncioTestCase):
     def setUp(self) -> None:
         self.session = MagicMock(spec=Session)
+        self.user = User(id=1, name="Dima", email="test@test.com", password="qwerty", avatar="ava", forbidden="False")
 
     async def test_get_users(self):
         users = [User(), User()]
@@ -27,7 +28,7 @@ class TestUsersRepository(unittest.IsolatedAsyncioTestCase):
         result = await get_user_by_email(email, self.session)
         self.assertEqual(result, user)
 
-    async def test_create_contact(self):
+    async def test_create_user(self):
         body = UserModel(name="Dima", email="ex@ex.com", password="qwerty")
         result = await create_user(body, self.session)
         self.assertEqual(result.name, body.name)
@@ -39,3 +40,17 @@ class TestUsersRepository(unittest.IsolatedAsyncioTestCase):
         refresh_token = "qweqrqadsd"
         result = await update_token(user, refresh_token, self.session)
         self.assertEqual(user.refresh_token, refresh_token)
+
+    async def test_update_avatar(self):
+        user = self.user
+        avatar = "avatar"
+        result = await update_avatar(user.email, avatar, self.session)
+        self.assertEqual(result.avatar, avatar)
+
+    async def test_ban_user(self):
+        result = await ban_user(self.user.email, self.session)
+        self.assertTrue(result.forbidden)
+
+    async def test_unban_user(self):
+        result = await unban_user(self.user.email, self.session)
+        self.assertFalse(result.forbidden)

@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -47,6 +49,11 @@ def client(session):
 
 @pytest.fixture(scope="module")
 def user():
-
-    return {"name": "deadpool", "email": "deadpool@example.com", "password": "123456789", "id": 1}
-
+    return {
+        "name": "deadpool",
+        "email": "deadpool@example.com",
+        "password": "123456789",
+        "id": 1,
+        "avatar": "ava",
+        "role": "admin",
+    }
