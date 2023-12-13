@@ -7,7 +7,7 @@ from src.database.models import User
 from src.database.db import get_db
 
 from src.services.auth import auth_service
-from src.services.cloud_avatar import CloudImage
+from src.services.cloud_avatar import CloudAvatar
 
 from src.schemas import UserResponse, ChangeRoleRequest
 
@@ -30,9 +30,9 @@ async def update_avatar_user(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
-    public_id = CloudImage.generate_name_avatar(current_user.email)
-    r = CloudImage.upload(file.file, public_id)
-    src_url = CloudImage.get_url_for_avatar(public_id, r)
+    public_id = CloudAvatar.generate_name_avatar(current_user.email)
+    r = CloudAvatar.upload_avatar(file.file, public_id)
+    src_url = CloudAvatar.get_url_for_avatar(public_id, r)
     user = await repository_users.update_avatar(current_user.email, src_url, db)
     return user
 

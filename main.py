@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.cors import CORSMiddleware
 
-from src.routes import auth, users, tags
+from src.routes import auth, users, tags, cloud_image
 
 app = FastAPI()
 
@@ -32,3 +32,4 @@ async def root(request: Request):
 app.include_router(auth.router, prefix='/project')
 app.include_router(users.router, prefix='/project')
 app.include_router(tags.router, prefix='/project')
+app.include_router(cloud_image.router, prefix='/project')

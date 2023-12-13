@@ -51,3 +51,24 @@ class ChangeRoleRequest(BaseModel):
                 f"Invalid role. Allowed roles are: {', '.join(allowed_roles)}"
             )
         return v
+
+class ImageModel(BaseModel):
+    id: int
+    url: str
+    public_id: str
+    user_id: int
+    
+class ImageAddResponse(BaseModel):
+    image: ImageModel
+
+class ImageDeleteResponse(BaseModel):
+    detail: str = "Image has been deleted"
+    
+class ImageUpdateResponse(BaseModel):
+    id: int
+    description: str
+    detail: str = "Image has been updated"
+    
+class ImageURLResponse(BaseModel):
+    url: str
+    
