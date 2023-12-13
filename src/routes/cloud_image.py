@@ -18,6 +18,7 @@ router = APIRouter(prefix="/cloud_image", tags=["cloud_image"])
 
 @router.post("/image", response_model=ImageModel, status_code=status.HTTP_201_CREATED)
 async def upload_image(
+    description:  str = None,
     file: UploadFile = File(),
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
@@ -25,7 +26,7 @@ async def upload_image(
     public_id = CloudImage.generate_name_image(current_user.email)
     upload_file = CloudImage.upload_image(file.file, public_id)
     src_url = CloudImage.get_url_for_image(public_id, upload_file)
-    image = await repository_image.add_image(db, src_url, public_id, current_user)
+    image = await repository_image.add_image(db, src_url, public_id, current_user, description)
     return image
 
 @router.delete("/{id}", response_model=ImageDeleteResponse, dependencies=[Depends(all_roles)])

@@ -33,7 +33,7 @@ class CloudImage:
     
     def delete_img(self, public_id: str):
         
-        cloudinary.uploader.destroy(public_id, **any)
+        cloudinary.uploader.destroy(public_id, resource_type = "image")
         return f'{public_id} deleted'
     
 image_cloudinary = CloudImage()

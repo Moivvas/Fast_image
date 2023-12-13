@@ -62,4 +62,4 @@ class ImageAddResponse(BaseModel):
     image: ImageModel
 
 class ImageDeleteResponse(BaseModel):
-    image: ImageModel
+    detail: str = "Image has been deleted"
