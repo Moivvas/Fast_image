@@ -63,3 +63,12 @@ class ImageAddResponse(BaseModel):
 
 class ImageDeleteResponse(BaseModel):
     detail: str = "Image has been deleted"
+    
+class ImageUpdateResponse(BaseModel):
+    id: int
+    description: str
+    detail: str = "Image has been updated"
+    
+class ImageURLResponse(BaseModel):
+    url: str
+    

@@ -9,3 +9,5 @@ USER_NOT_FOUND = "User not found."
 
 TAG_ALREADY_EXISTS = "Tag already exists"
 INVALID_TAG = "Invalid tag"
+
+IMAGE_NOT_FOUND ="Image not found"

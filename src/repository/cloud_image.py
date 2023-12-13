@@ -21,9 +21,20 @@ async def show_image(db: Session, id: int, user: User):
 
 async def delete_image(db: Session, id: int):
     db_image = db.query(Image).filter(Image.id == id).first()
-    
-    
     image_cloudinary.delete_img(db_image.public_id)
     db.delete(db_image)
     db.commit()
+    return db_image
+
+async def update_desc(db: Session, id:int, description=str):
+    db_image = db.query(Image).filter(Image.id == id).first()
+    db_image.description = description
+    db.commit()
+    db.refresh(db_image)
+    return db_image
+
+
+
+def get_image_by_id(db: Session, image_id: int) -> Image:
+    db_image = db.query(Image).filter(Image.id == image_id).first()
     return db_image
