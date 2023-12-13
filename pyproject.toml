@@ -23,7 +23,6 @@ pydantic-settings = "^2.1.0"
 cloudinary = "^1.37.0"
 jinja2 = "^3.1.2"
 redis = "4.6"
-pytest-aiohttp = "^1.0.5"
 
 
 [tool.poetry.group.dev.dependencies]
