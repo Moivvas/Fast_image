@@ -58,3 +58,11 @@ def user():
         "avatar": "ava",
         "role": "admin",
     }
+
+@pytest.fixture(scope="module")
+def tag():
+
+    return {
+        "tag_name": "test_tag",
+        "id": 1
+    }

@@ -46,7 +46,7 @@ async def get_all_tags(db: Session = Depends(get_db), current_user: User = Depen
     return tags
     
 
-@router.patch("/", response_model=TagResponse)
+@router.patch("/{tag_id}", response_model=TagResponse)
 async def update_tag(tag_id: int, body: TagModel, db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)) -> Tag | None:
     tag = await repo_tags.update_tag(tag_id, body, db)
     if tag is None:
