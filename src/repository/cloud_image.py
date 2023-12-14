@@ -16,8 +16,10 @@ async def add_image(db: Session, url: str, public_id: str, user: User, descripti
     db.refresh(db_image)
     return db_image
 
+
 async def show_image(db: Session, id: int, user: User):
     pass
+
 
 async def delete_image(db: Session, id: int):
     db_image = db.query(Image).filter(Image.id == id).first()
@@ -26,13 +28,13 @@ async def delete_image(db: Session, id: int):
     db.commit()
     return db_image
 
-async def update_desc(db: Session, id:int, description=str):
+
+async def update_desc(db: Session, id: int, description=str):
     db_image = db.query(Image).filter(Image.id == id).first()
     db_image.description = description
     db.commit()
     db.refresh(db_image)
     return db_image
-
 
 
 def get_image_by_id(db: Session, image_id: int) -> Image:
