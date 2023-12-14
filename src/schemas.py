@@ -9,6 +9,7 @@ from src.database.models import Role
 class UserModel(BaseModel):
     name: str
     email: EmailStr
+    sex: str
     password: str = Field(min_length=6, max_length=16)
 
 
@@ -17,6 +18,7 @@ class UserResponse(BaseModel):
     id: int
     name: str
     email: str
+    sex: str
     role: Role
     avatar: str | None
     forbidden: bool
@@ -87,10 +89,8 @@ class RatingModel(BaseModel):
 
 
 class RatingResponse(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
     id: int
     rate: int
     user_id: int
     image_id: int
-
-    class Config:
-        orm_mode = True

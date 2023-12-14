@@ -64,6 +64,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False, unique=True)
     email = Column(String(45), nullable=False, unique=True)
+    sex = Column(String(45), nullable=False)
     password = Column(String(150), nullable=False)
     created_at = Column('created_at', DateTime, default=func.now())
     refresh_token = Column(String(255))
