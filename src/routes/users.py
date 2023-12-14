@@ -1,15 +1,21 @@
 from typing import Type
 
 from fastapi import APIRouter, Depends, UploadFile, File
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
-from src.database.models import User
+from src.database.models import User, Image, Comment
 from src.database.db import get_db
 
 from src.services.auth import auth_service
 from src.services.cloud_avatar import CloudAvatar
 
-from src.schemas import UserResponse, ChangeRoleRequest
+from src.schemas import (
+    UserResponse,
+    ChangeRoleRequest,
+    UserProfile,
+    CommentByUser,
+    ImageProfile,
+)
 
 from src.repository import users as repository_users
 from src.services.roles import admin_and_moder, only_admin
@@ -68,3 +74,9 @@ async def change_user_role(
 ) -> User:
     user = await repository_users.change_user_role(body, db)
     return user
+
+
+@router.get("/{user_id}", response_model=UserProfile)
+async def get_user_profile(user_id, db: Session = Depends(get_db)):
+    user_profile = await repository_users.get_user_profile_by_id(user_id, db)
+    return user_profile

@@ -58,3 +58,7 @@ def test_user_change_role(user, session, client, token):
     assert payload["name"] == "Dima"
     assert payload["email"] == "exam@exam.com"
     assert payload["role"] == "moderator"
+
+
+
+

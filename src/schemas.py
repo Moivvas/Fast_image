@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from datetime import date
 
@@ -94,3 +96,19 @@ class RatingResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class CommentByUser(BaseModel):
+    user_id: int
+    comment: str
+
+
+class ImageProfile(BaseModel):
+    url: str
+    tags: List[str] | None
+    comments: List[CommentByUser] | None
+
+
+class UserProfile(BaseModel):
+    user: UserResponse
+    images: List[ImageProfile]
