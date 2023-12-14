@@ -53,5 +53,37 @@ class CloudImage:
         except Exception as e:
             print(messages.UNEXPECTED_ERROR, str(e))
             return None, None
+        
+    async def fade_edges_image(self, public_id: str, effect: str = "vignette") -> str:
+        try:
+            img = cloudinary.CloudinaryImage(public_id).image(effect=effect)
+            url = img.split('"')
+            upload_image = cloudinary.uploader.upload(url[1], folder="fast_image")
+            return upload_image['url'], upload_image['public_id']
+        except cloudinary.api.Error as e:
+            print(messages.CLOUDINARY_API_ERROR, e.message)
+            return None, None
+        except cloudinary.exceptions.Error as e:
+            print(messages.CLOUDINARY_ERROR, e)
+            return None, None
+        except Exception as e:
+            print(messages.UNEXPECTED_ERROR, str(e))
+            return None, None
+
+    async def make_black_white_image(self, public_id: str, effect: str = "art:audrey") -> str:
+        try:
+            img = cloudinary.CloudinaryImage(public_id).image(effect=effect)
+            url = img.split('"')
+            upload_image = cloudinary.uploader.upload(url[1], folder="fast_image")
+            return upload_image['url'], upload_image['public_id']
+        except cloudinary.api.Error as e:
+            print(messages.CLOUDINARY_API_ERROR, e.message)
+            return None, None
+        except cloudinary.exceptions.Error as e:
+            print(messages.CLOUDINARY_ERROR, e)
+            return None, None
+        except Exception as e:
+            print(messages.UNEXPECTED_ERROR, str(e))
+            return None, None
 
 image_cloudinary = CloudImage()

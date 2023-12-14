@@ -86,6 +86,10 @@ class ImageChangeSizeModel(BaseModel):
     width: int = 200
 
 
+class ImageTransformModel(BaseModel):
+    id: int
+
+
 class AverageRatingResponse(BaseModel):
     average_rating: float
 
