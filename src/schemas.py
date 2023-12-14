@@ -64,6 +64,7 @@ class ImageModel(BaseModel):
 
 class ImageAddResponse(BaseModel):
     image: ImageModel
+    detail: str = "Image has been added"
 
 
 class ImageDeleteResponse(BaseModel):
@@ -78,6 +79,11 @@ class ImageUpdateResponse(BaseModel):
 
 class ImageURLResponse(BaseModel):
     url: str
+    
+
+class ImageChangeSizeModel(BaseModel):
+    id: int
+    width: int = 200
 
 
 class AverageRatingResponse(BaseModel):
@@ -94,3 +100,4 @@ class RatingResponse(BaseModel):
     rate: int
     user_id: int
     image_id: int
+

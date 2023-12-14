@@ -4,6 +4,7 @@ import cloudinary
 import cloudinary.uploader
 
 from src.conf.config import settings
+from src.conf import messages
 
 
 class CloudImage:
@@ -35,5 +36,22 @@ class CloudImage:
         cloudinary.uploader.destroy(public_id, resource_type="image")
         return f'{public_id} deleted'
 
+    
+    async def change_size(self, public_id: str, width: int) -> str:
+        try:
+            img = cloudinary.CloudinaryImage(public_id).image(
+                transformation=[{"width": width, "crop": "pad"}])
+            url = img.split('"')
+            upload_image = cloudinary.uploader.upload(url[1], folder="fast_image")
+            return upload_image['url'], upload_image['public_id']
+        except cloudinary.api.Error as e:
+            print(messages.CLOUDINARY_API_ERROR, e.message)
+            return None, None
+        except cloudinary.exceptions.Error as e:
+            print(messages.CLOUDINARY_ERROR, e)
+            return None, None
+        except Exception as e:
+            print(messages.UNEXPECTED_ERROR, str(e))
+            return None, None
 
 image_cloudinary = CloudImage()
