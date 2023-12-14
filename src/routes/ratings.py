@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, Path, status, HTTPException
+from fastapi import APIRouter, Depends, Path, HTTPException
 
 from src.database.models import User, Role
 from src.repository import ratings as repository_ratings
@@ -7,6 +7,7 @@ from src.schemas import RatingResponse, AverageRatingResponse, ImageURLResponse
 from src.database.db import get_db
 from src.services.auth import auth_service
 from src.services.roles import RoleAccess
+from src.conf import messages
 
 from sqlalchemy.orm import Session
 
@@ -25,7 +26,7 @@ async def create_rate(image_id: int,
                       current_user: User = Depends(auth_service.get_current_user)):
     new_rate = await repository_ratings.create_rating(image_id, rate, db, current_user)
     if new_rate is None:
-        raise HTTPException(status_code=404, detail='Image not found')
+        raise HTTPException(status_code=404, detail=messages.IMAGE_NOT_FOUND)
     return new_rate
 
 
@@ -35,7 +36,7 @@ async def rating(image_id: int,
                  current_user: User = Depends(auth_service.get_current_user)):
     average_rate = await repository_ratings.calculate_rating(image_id, db, current_user)
     if average_rate is None:
-        raise HTTPException(status_code=404, detail='Image not found')
+        raise HTTPException(status_code=404, detail=messages.IMAGE_NOT_FOUND)
     return {'average_rating': average_rate}
 
 
@@ -43,7 +44,7 @@ async def rating(image_id: int,
 async def image_by_rating(db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)):
     images_by_rating = await repository_ratings.images_by_rating(db, current_user)
     if images_by_rating is None:
-        raise HTTPException(status_code=404, detail='Images not found')
+        raise HTTPException(status_code=404, detail=messages.IMAGE_NOT_FOUND)
     return images_by_rating
 
 
@@ -53,5 +54,5 @@ async def delete_rate(rate_id: int,
                       current_user: User = Depends(auth_service.get_current_user)):
     deleted_rate = await repository_ratings.del_rate(rate_id, db, current_user)
     if deleted_rate is None:
-        raise HTTPException(status_code=404, detail='Rate not found')
+        raise HTTPException(status_code=404, detail=messages.RATE_NOT_FOUND)
     return deleted_rate

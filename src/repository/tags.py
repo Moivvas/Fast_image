@@ -6,7 +6,7 @@ from src.database.models import Tag
 from src.schemas import TagModel
 
 
-async def create_tag(body:TagModel, db: Session) -> Tag:
+async def create_tag(body: TagModel, db: Session) -> Tag:
     tag = Tag(tag_name=body.tag_name.lower())
     db.add(tag)
     db.commit()
@@ -29,7 +29,7 @@ async def get_tags(db: Session) -> List[Type[Tag]]:
     return tags
 
 
-async def update_tag(tag_id: int, body:TagModel, db: Session) -> Tag | None:
+async def update_tag(tag_id: int, body: TagModel, db: Session) -> Tag | None:
     tag = await get_tag_by_id(tag_id, db)
     if tag:
         tag_new = db.query(Tag).filter(Tag.tag_name == body.tag_name.lower())
