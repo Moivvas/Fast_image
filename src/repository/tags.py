@@ -6,7 +6,7 @@ from src.database.models import Tag
 from src.schemas import TagModel
 
 
-async def create_tag(body:TagModel, db: Session) -> Tag:
+async def create_tag(body: TagModel, db: Session) -> Tag:
     tag = Tag(tag_name=body.tag_name.lower())
     db.add(tag)
     db.commit()

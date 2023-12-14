@@ -1,5 +1,5 @@
 
-from sqlalchemy import Column, Integer, Float, String, Boolean, func, Table, Enum
+from sqlalchemy import Column, Integer, Float, String, Boolean, func, Table, Enum, Text
 import enum
 
 
@@ -71,6 +71,16 @@ class User(Base):
     role = Column('role', Enum(Role), default=Role.user)
     images = relationship('Image', backref="users")
     avatar = Column(String(255), nullable=True)
+
+
+class Rating(Base):
+    __tablename__ = 'ratings'
+    id = Column(Integer, primary_key=True)
+    rate = Column('rate', Integer, default=0)
+    user_id = Column(Integer, ForeignKey(User.id, ondelete='CASCADE'))
+    image_id = Column(Integer, ForeignKey(Image.id, ondelete='CASCADE'))
+    user = relationship('User', backref='ratings')
+    image = relationship('Image', backref='ratings')
 
 
 class Token(Base):

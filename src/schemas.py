@@ -52,23 +52,45 @@ class ChangeRoleRequest(BaseModel):
             )
         return v
 
+
 class ImageModel(BaseModel):
     id: int
     url: str
     public_id: str
     user_id: int
-    
+
+
 class ImageAddResponse(BaseModel):
     image: ImageModel
 
+
 class ImageDeleteResponse(BaseModel):
     detail: str = "Image has been deleted"
-    
+
+
 class ImageUpdateResponse(BaseModel):
     id: int
     description: str
     detail: str = "Image has been updated"
-    
+
+
 class ImageURLResponse(BaseModel):
     url: str
-    
+
+
+class AverageRatingResponse(BaseModel):
+    average_rating: float
+
+
+class RatingModel(BaseModel):
+    rate: int
+
+
+class RatingResponse(BaseModel):
+    id: int
+    rate: int
+    user_id: int
+    image_id: int
+
+    class Config:
+        orm_mode = True

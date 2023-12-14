@@ -29,11 +29,11 @@ class CloudImage:
         src_url = cloudinary.CloudinaryImage(public_id) \
             .build_url(width=250, height=250, crop='fill', version=upload_file.get('version'))
         return src_url
-    
-    
+
     def delete_img(self, public_id: str):
         
-        cloudinary.uploader.destroy(public_id, resource_type = "image")
+        cloudinary.uploader.destroy(public_id, resource_type="image")
         return f'{public_id} deleted'
-    
+
+
 image_cloudinary = CloudImage()

@@ -14,18 +14,22 @@ router = APIRouter(prefix="/tags", tags=["tags"])
 
 
 @router.post('/', response_model=TagResponse)
-async def create_tag(body:TagModel, db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)) -> Tag | None:
+async def create_tag(body: TagModel,
+                     db: Session = Depends(get_db),
+                     current_user: User = Depends(auth_service.get_current_user)) -> Tag | None:
     tag_exist = await repo_tags.get_tag_by_name(body.tag_name.lower(), db)
     if tag_exist:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=messages.TAG_ALREADY_EXISTS)
-    tag =  await repo_tags.create_tag(body, db)
+    tag = await repo_tags.create_tag(body, db)
     if tag is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
     return tag
 
 
 @router.get("/{tag_id}", response_model=TagResponse)
-async def get_tag_by_id(tag_id: int, db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)) -> Tag | None:
+async def get_tag_by_id(tag_id: int,
+                        db: Session = Depends(get_db),
+                        current_user: User = Depends(auth_service.get_current_user)) -> Tag | None:
     tag = await repo_tags.get_tag_by_id(tag_id, db)
     if tag is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.INVALID_TAG)
@@ -33,7 +37,9 @@ async def get_tag_by_id(tag_id: int, db: Session = Depends(get_db), current_user
 
 
 @router.get("/{tag_name}", response_model=TagResponse)
-async def get_tag_by_name(tag_name: str, db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)) -> Tag | None:
+async def get_tag_by_name(tag_name: str,
+                          db: Session = Depends(get_db),
+                          current_user: User = Depends(auth_service.get_current_user)) -> Tag | None:
     tag = await repo_tags.get_tag_by_name(tag_name, db)
     if tag is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.INVALID_TAG)
@@ -41,7 +47,8 @@ async def get_tag_by_name(tag_name: str, db: Session = Depends(get_db), current_
 
 
 @router.get("/", response_model=List[TagResponse])
-async def get_all_tags(db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)) -> List[Tag] | None:
+async def get_all_tags(db: Session = Depends(get_db),
+                       current_user: User = Depends(auth_service.get_current_user)) -> List[Tag] | None:
     tags = await repo_tags.get_tags(db)
     return tags
     
@@ -55,7 +62,10 @@ async def update_tag(tag_id: int, body: TagModel, db: Session = Depends(get_db),
 
 
 @router.delete("/", response_model=TagResponse)
-async def delete_tag(identifier: str, by_id: bool = False, db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)) -> Tag | None:
+async def delete_tag(identifier: str,
+                     by_id: bool = False,
+                     db: Session = Depends(get_db),
+                     current_user: User = Depends(auth_service.get_current_user)) -> Tag | None:
     if by_id:
         tag = await repo_tags.remove_tag_by_id(int(identifier), db)
     else:
