@@ -23,8 +23,9 @@ async def create_user(body: UserModel, db: Session) -> User:
         name=body.name,
         email=body.email,
         sex=body.sex,
-        avatar=female_avatar_url if body.sex == "female" else male_avatar_url
+        password=body.password
     )
+    new_user.avatar=female_avatar_url if body.sex == "female" else male_avatar_url,
     if not users:
         new_user.role = "admin"
     db.add(new_user)
