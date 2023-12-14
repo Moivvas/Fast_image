@@ -1,7 +1,7 @@
 from typing import List
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
-from datetime import date
+from datetime import datetime
 
 from pydantic_settings import SettingsConfigDict
 
@@ -109,6 +109,29 @@ class ImageProfile(BaseModel):
     comments: List[CommentByUser] | None
 
 
+class UserInfoProfile(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
+    id: int
+    name: str
+    email: EmailStr
+    role: Role
+    avatar: str | None
+    forbidden: bool
+    created_at: datetime
+
+
+class UserProfileMe(BaseModel):
+    name: str
+    email: EmailStr
+    avatar: str | None
+
+
+class ProfileMe(BaseModel):
+    user: UserProfileMe
+    images: List[ImageProfile] | None
+
+
 class UserProfile(BaseModel):
-    user: UserResponse
-    images: List[ImageProfile]
+    user: UserInfoProfile
+    images: List[ImageProfile] | None
+

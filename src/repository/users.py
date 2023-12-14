@@ -9,6 +9,9 @@ from src.schemas import (
     CommentByUser,
     ImageProfile,
     UserProfile,
+    UserInfoProfile,
+    UserProfileMe,
+    ProfileMe,
 )
 
 
@@ -75,15 +78,17 @@ async def change_user_role(body: ChangeRoleRequest, db: Session) -> User | None:
     return user
 
 
-async def get_user_profile_by_id(user_id: int, db: Session):
+async def get_user_profile_by_id(user_id: int, db: Session, current_user: User):
+
     user = await get_user_by_id(user_id, db)
-    user = UserResponse(
+    user = UserInfoProfile(
         id=user.id,
         name=user.name,
         email=user.email,
         role=user.role,
         avatar=user.avatar,
         forbidden=user.forbidden,
+        created_at=user.created_at
     )
     user_photos = (
         db.query(Image)
@@ -105,3 +110,32 @@ async def get_user_profile_by_id(user_id: int, db: Session):
         images.append(new_image)
     user_profile = UserProfile(user=user, images=images)
     return user_profile
+
+
+async def get_user_profile_me(db: Session, current_user: User):
+    user = UserProfileMe(
+        name=current_user.name,
+        email=current_user.email,
+        avatar=current_user.avatar,
+    )
+    user_photos = (
+        db.query(Image)
+        .filter_by(user_id=current_user.id)
+        .options(joinedload(Image.tags), joinedload(Image.comments))
+        .all()
+    )
+    images = []
+    for image in user_photos:
+        tags = []
+        comments = []
+        for comment in image.comments:
+            new_comment = CommentByUser(user_id=comment.user_id, comment=comment.comment)
+            comments.append(new_comment)
+        for tag in image.tags:
+            new_tag = tag.tag_name
+            tags.append(new_tag)
+        new_image = ImageProfile(url=image.url, tags=tags, comments=comments)
+        images.append(new_image)
+    user_profile = ProfileMe(user=user, images=images)
+    return user_profile
+
