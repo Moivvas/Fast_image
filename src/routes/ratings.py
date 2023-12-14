@@ -29,11 +29,11 @@ async def create_rate(image_id: int,
     return new_rate
 
 
-@router.get('image_rating/{image_id}', response_model=AverageRatingResponse)
+@router.get('/image_rating/{image_id}', response_model=AverageRatingResponse)
 async def rating(image_id: int,
                  db: Session = Depends(get_db),
                  current_user: User = Depends(auth_service.get_current_user)):
-    average_rate = await repository_ratings.create_rating(image_id, db, current_user)
+    average_rate = await repository_ratings.calculate_rating(image_id, db, current_user)
     if average_rate is None:
         raise HTTPException(status_code=404, detail='Image not found')
     return {'average_rating': average_rate}
