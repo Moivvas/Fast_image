@@ -22,7 +22,8 @@ from src.schemas import (
     ImageProfile,
     CommentByUser,
     ImagesByFilter,
-    ImageQRResponse
+    ImageQRResponse,
+    AddTag
 )
 
 from src.conf import messages
@@ -236,7 +237,23 @@ async def create_qr(body: ImageTransformModel, db: Session, user: User):
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     
-    
+
+async def add_tag(db: Session, user: User, image_id: int, tag_name: str):
+        image = db.query(Image).filter(Image.id == image_id).first()
+
+        tag = db.query(Tag).filter(Tag.tag_name == tag_name).first()
+
+        if not image or not tag:
+            return None
+
+        if len(image.tags) >= 5:
+            raise HTTPException(status_code=status.HTTP_406_INTERNAL_SERVER_ERROR, detail= messages.TODO)
+
+
+        image.tags.append(tag)
+        db.commit()
+        db.refresh()
+        return AddTag()
 
 
 
