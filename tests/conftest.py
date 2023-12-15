@@ -11,7 +11,6 @@ from src.database.db import get_db
 
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-print(SQLALCHEMY_DATABASE_URL)
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}

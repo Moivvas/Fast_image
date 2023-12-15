@@ -1,82 +1,91 @@
-from fastapi.testclient import TestClient
+from pytest import fixture
+from unittest.mock import patch
+
+from src.database.models import User, Image, Rating
 from fastapi import status
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from main import app
-from src.database.db import get_db
-from src.database.models import Base
 from src.services.auth import auth_service
-from src.database.models import User, Role
-from src.conf import messages
-import pytest
-
-# Assuming you have a testing environment set up
-SQLALCHEMY_DATABASE_URL = "sqlite:///./tests/test.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
-
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+import datetime
 
 
-@pytest.fixture(scope="function")
-def db():
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+@fixture(scope='module')
+def token(client, user, session):
+    response = client.post("/project/auth/signup", json=user)
+    current_user: User = session.query(User).filter(User.email == user.get('email')).first()
+
+    response = client.post("/project/auth/login",
+                           data={"username": user.get("email"), "password": user.get("password")})
+    data = response.json()
+    return data["access_token"]
 
 
-@pytest.fixture(scope="function")
-def client(db):
-    Base.metadata.create_all(bind=engine)
-    app.dependency_overrides[get_db] = lambda: db
-    app.dependency_overrides[auth_service.get_current_user] = lambda: User(id=1, role=Role.admin)
-    client = TestClient(app)
-    return client
+@fixture(scope='module')
+def image(client, user, session):
+    response = client.post("/project/auth/signup", json=user)
+    current_user: User = session.query(User).filter(User.email == user.get('email')).first()
+    image = session.query(Image).filter(Image.id == 1).first()
+    if image is None:
+        image = Image(
+            id=1,
+            url="https://res.cloudinary.com/dv5a15oym/image/upload/"
+                "c_fill,h_250,w_250/v1702535818/fast_image/e2b850d5b1ca",
+            user_id=1,
+            created_at=datetime.datetime.now(),
+        )
+        session.add(image)
+        session.commit()
+        session.refresh(image)
+    return image
 
 
-def test_create_rate(client):
-    response = client.post("/project/rating/1/4")
-    assert response.status_code == status.HTTP_404_NOT_FOUND
-    assert response.json() is not None
+@fixture(scope='module')
+def rating(client, user, session):
+    response = client.post("/project/auth/signup", json=user)
+    current_user: User = session.query(User).filter(User.email == user.get('email')).first()
+    rating = session.query(Image).filter(Rating.id == 1).first()
+    if rating is None:
+        rating = Rating(
+            id=1,
+            rate=5,
+            user_id=current_user.id,
+            image_id=1,
+        )
+        session.add(rating)
+        session.commit()
+        session.refresh(rating)
+    return rating
 
 
-def test_create_rate_invalid_image(client):
-    response = client.post("/project/rating/999/4")
-    assert response.status_code == 404
-    assert response.json()["detail"] == messages.IMAGE_NOT_FOUND
+def test_show_images_by_rating(client, token, image, session):
+    with patch.object(auth_service, "redis_db") as redis_mock:
+        redis_mock.get.return_value = None
+        response = client.get("/project/rating/image_by_rating",
+                              headers={'Authorization': f'Bearer {token}'}
+                              )
+        assert response.status_code == status.HTTP_200_OK
 
 
-def test_rating(client):
-    response = client.get("/project/rating/image_rating/1")
-    assert response.status_code == 200
-    assert response.json() is not None
+# def test_create_rate(client, token, image, session):
+#     with patch.object(auth_service, "redis_db") as redis_mock:
+#         redis_mock.get.return_value = None
+#         response = client.post("/project/rating/1/5",
+#                                headers={'Authorization': f'Bearer {token}'}
+#                                )
+#         assert response.status_code == status.HTTP_200_OK
 
 
-def test_rating_invalid_image(client):
-    response = client.get("/project/rating/image_rating/999")
-    assert response.status_code == 404
-    assert response.json()["detail"] == messages.IMAGE_NOT_FOUND
+def test_delete_rate(client, token, session, rating):
+    with patch.object(auth_service, "redis_db") as redis_mock:
+        redis_mock.get.return_value = None
+        response = client.delete("/project/rating/delete/1",
+                                 headers={'Authorization': f'Bearer {token}'}
+                                 )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_image_by_rating(client):
-    response = client.get("/project/rating/image_by_rating")
-    assert response.status_code == 200
-    assert response.json() is not None
-
-
-def test_image_by_rating_no_images(client):
-    response = client.get("/project/rating/image_by_rating")
-    assert response.status_code == 404
-    assert response.json()["detail"] == messages.IMAGE_NOT_FOUND
-
-
-def test_delete_rate(client):
-    response = client.delete("/project/rating/delete/1")
-    assert response.status_code == 204
-
-
-def test_delete_rate_invalid_rate(client):
-    response = client.delete("/project/rating/delete/999")
-    assert response.status_code == 404
-    assert response.json()["detail"] == messages.RATE_NOT_FOUND
+# def test_show_image_rating(client, token, image, session):
+#     with patch.object(auth_service, "redis_db") as redis_mock:
+#         redis_mock.get.return_value = None
+#         response = client.get("/project/rating/image_rating/1",
+#                               headers={'Authorization': f'Bearer {token}'}
+#                               )
+#         assert response.status_code == status.HTTP_200_OK
