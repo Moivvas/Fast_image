@@ -10,6 +10,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 
+from src.conf import messages
 from src.database.db import get_db
 from src.repository import users as repository_users
 from src.conf.config import settings
@@ -72,12 +73,12 @@ class Auth:
                 return email
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid scope for token",
+                detail=messages.INVALID_SCOPE_FOR_TOKEN,
             )
         except JWTError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Could not validate credentials",
+                detail=messages.COULD_NOT_VALIDATE_CREDENTIALS,
             )
 
     async def ban_token(self, access_token):
@@ -95,13 +96,13 @@ class Auth:
 
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail=messages.COULD_NOT_VALIDATE_CREDENTIALS,
             headers={"WWW-Authenticate": "Bearer"},
         )
 
         banned_token = await self.banned_token(token)
         if banned_token:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User is not authorized")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=messages.USER_IS_NOT_AUTHORIZED)
         try:
             payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
             if payload["scope"] == "access_token":

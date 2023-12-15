@@ -1,5 +1,7 @@
+from typing import List
+
 from pydantic import BaseModel, EmailStr, Field, field_validator
-from datetime import date
+from datetime import datetime
 
 from pydantic_settings import SettingsConfigDict
 
@@ -9,6 +11,7 @@ from src.database.models import Role
 class UserModel(BaseModel):
     name: str
     email: EmailStr
+    sex: str
     password: str = Field(min_length=6, max_length=16)
 
 
@@ -17,6 +20,7 @@ class UserResponse(BaseModel):
     id: int
     name: str
     email: str
+    sex: str
     role: Role
     avatar: str | None
     forbidden: bool
@@ -62,6 +66,7 @@ class ImageModel(BaseModel):
 
 class ImageAddResponse(BaseModel):
     image: ImageModel
+    detail: str = "Image has been added"
 
 
 class ImageDeleteResponse(BaseModel):
@@ -76,6 +81,15 @@ class ImageUpdateResponse(BaseModel):
 
 class ImageURLResponse(BaseModel):
     url: str
+    
+
+class ImageChangeSizeModel(BaseModel):
+    id: int
+    width: int = 200
+
+
+class ImageTransformModel(BaseModel):
+    id: int
 
 
 class AverageRatingResponse(BaseModel):
@@ -87,6 +101,7 @@ class RatingModel(BaseModel):
 
 
 class RatingResponse(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
     id: int
     rate: int
     user_id: int
@@ -94,3 +109,49 @@ class RatingResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class CommentByUser(BaseModel):
+    user_id: int
+    comment: str
+
+
+class ImageProfile(BaseModel):
+    url: str
+    tags: List[str] | None
+    comments: List[CommentByUser] | None
+
+
+class UserInfoProfile(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
+    id: int
+    name: str
+    email: EmailStr
+    role: Role
+    avatar: str | None
+    forbidden: bool
+    created_at: datetime
+
+
+class UserProfileMe(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
+    name: str
+    email: EmailStr
+    avatar: str | None
+
+
+class ProfileMe(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
+    user: UserProfileMe
+    images: List[ImageProfile] | None
+
+
+class UserProfile(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
+    user: UserInfoProfile
+    images: List[ImageProfile] | None
+
+
+class AllUsersProfiles(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
+    users: List[UserProfile]
