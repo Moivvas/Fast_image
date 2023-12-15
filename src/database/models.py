@@ -1,13 +1,11 @@
 
-from sqlalchemy import Column, Integer, Float, String, Boolean, func, Table, Enum, Text
+from sqlalchemy import Column, Integer, String, Boolean, func, Table, Enum
 import enum
 
 
 from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.sql.sqltypes import DateTime
-# from sqlalchemy.ext.declarative import declarative_base
-from typing import List
 
 Base = declarative_base()
 
@@ -26,7 +24,6 @@ class Image(Base):
     id = Column(Integer, primary_key=True)
     url = Column(String(255), nullable=False)
     public_id = Column(String(150))
-    image_name = Column(String(150))
     description = Column(String(150))
     user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
     tags = relationship("Tag", secondary=image_m2m_tag, back_populates="images")
@@ -34,7 +31,6 @@ class Image(Base):
     created_at = Column("created_at", DateTime, default=func.now())
     updated_at = Column("updated_at", DateTime, default=func.now(), onupdate=func.now())
     qr_url = Column(String(255), nullable=True)
-
 
 
 class Tag(Base):
@@ -84,9 +80,3 @@ class Rating(Base):
     image_id = Column(Integer, ForeignKey(Image.id, ondelete='CASCADE'))
     user = relationship('User', backref='ratings')
     image = relationship('Image', backref='ratings')
-
-
-class Token(Base):
-    __tablename__ = "token_black_list"
-    access_token = Column(String(255), primary_key=True)
-    created_at = Column('created_at', DateTime, default=func.now())

@@ -22,6 +22,7 @@ from src.schemas import (
     ImageProfile,
     CommentByUser,
     ImagesByFilter,
+    ImageQRResponse
 )
 
 from src.conf import messages
@@ -39,10 +40,6 @@ async def add_image(
     db.commit()
     db.refresh(db_image)
     return db_image
-
-
-async def show_image(db: Session, id: int, user: User):
-    pass
 
 
 async def delete_image(db: Session, id: int):
@@ -207,8 +204,6 @@ async def get_all_images(
     all_images = ImagesByFilter(images=images)
     return all_images
 
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-    
 
 async def create_qr(body: ImageTransformModel, db: Session, user: User):
     try:
@@ -232,13 +227,16 @@ async def create_qr(body: ImageTransformModel, db: Session, user: User):
 
         qr_code_url = CloudImage.get_url_for_image(new_public_id, upload_file)
         
-        # Оновлення поля qr_url для існуючого об'єкту Image
         image.qr_url = qr_code_url
         
-        db.commit()  # Збереження оновлення поля qr_url
-        
+        db.commit()
+                
         return ImageQRResponse(image_id=image.id, qr_code_url=qr_code_url)
     
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    
+    
+
+
 

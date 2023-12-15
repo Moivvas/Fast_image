@@ -51,9 +51,11 @@ class CloudImage:
         src_url = upload_file.get("secure_url")
         return src_url
 
+
     def delete_img(self, public_id: str):
         cloudinary.uploader.destroy(public_id, resource_type="image")
         return f"{public_id} deleted"
+
 
     @wrapper
     async def change_size(self, public_id: str, width: int) -> str:

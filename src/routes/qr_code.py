@@ -6,7 +6,7 @@ from src.database.db import get_db
 
 from src.services.auth import auth_service
 from src.conf import messages
-from src.schemas import ImageAddResponse, ImageTransformModel, ImageQRResponse
+from src.schemas import  ImageTransformModel, ImageQRResponse
 
 from src.repository import cloud_image as repository_image
 from src.services.roles import all_roles, only_admin, admin_and_moder
