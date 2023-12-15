@@ -14,7 +14,7 @@ from src.schemas import (
     ProfileMe,
     AllUsersProfiles,
 )
-
+from src.repository import ratings as repository_rating
 
 async def get_users(db: Session) -> list[Type[User]]:
     users = db.query(User).all()
@@ -44,7 +44,7 @@ async def create_user(body: UserModel, db: Session) -> User:
         sex=body.sex,
         password=body.password
     )
-    new_user.avatar=female_avatar_url if body.sex == "female" else male_avatar_url,
+    new_user.avatar = female_avatar_url if body.sex == "female" else male_avatar_url
     if not users:
         new_user.role = "admin"
     db.add(new_user)
@@ -115,12 +115,12 @@ async def get_user_profile_me(db: Session, current_user: User):
         email=current_user.email,
         avatar=current_user.avatar,
     )
-    images = await get_user_images_by_id(current_user.id, db)
+    images = await get_user_images_by_id(current_user.id, db, current_user)
     user_profile = ProfileMe(user=user, images=images)
     return user_profile
 
 
-async def get_user_images_by_id(user_id: int, db: Session):
+async def get_user_images_by_id(user_id: int, db: Session, current_user: User):
     user_photos = (
         db.query(Image)
         .filter_by(user_id=user_id)
@@ -137,7 +137,8 @@ async def get_user_images_by_id(user_id: int, db: Session):
         for tag in image.tags:
             new_tag = tag.tag_name
             tags.append(new_tag)
-        new_image = ImageProfile(url=image.url, tags=tags, comments=comments)
+        rating = await repository_rating.calculate_rating(image.id, db, current_user)
+        new_image = ImageProfile(url=image.url, description=image.description, average_rating=rating, tags=tags, comments=comments)
         images.append(new_image)
     return images
 
@@ -155,7 +156,7 @@ async def get_users_profiles(db: Session, current_user: User):
             forbidden=user.forbidden,
             created_at=user.created_at,
         )
-        images = await get_user_images_by_id(user.id, db)
+        images = await get_user_images_by_id(user.id, db, current_user)
         user_profile = UserProfile(user=user_data, images=images)
         users_profiles.append(user_profile)
     all_users_profiles = AllUsersProfiles(users=users_profiles)

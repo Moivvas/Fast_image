@@ -33,6 +33,8 @@ class Image(Base):
     comments = relationship('Comment', backref="images")
     created_at = Column("created_at", DateTime, default=func.now())
     updated_at = Column("updated_at", DateTime, default=func.now(), onupdate=func.now())
+    qr_url = Column(String(255), nullable=True)
+
 
 
 class Tag(Base):

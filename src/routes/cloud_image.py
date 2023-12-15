@@ -1,13 +1,24 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
+from datetime import datetime
+
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status, Query
+from sqlalchemy import or_, func, desc
 from sqlalchemy.orm import Session
 
-from src.database.models import User
+from src.database.models import User, Image, Tag, Rating
 from src.database.db import get_db
-
+from src.repository import ratings as repository_ratings
+from src.repository.cloud_image import get_all_images
 from src.services.auth import auth_service
 from src.services.cloud_images_service import CloudImage
 from src.conf import messages
-from src.schemas import ImageDeleteResponse, ImageUpdateResponse, ImageURLResponse, ImageModel
+from src.schemas import (
+    ImageDeleteResponse,
+    ImageUpdateResponse,
+    ImageURLResponse,
+    ImageModel,
+    ImagesByFilter,
+    ImageProfile,
+)
 
 from src.repository import cloud_image as repository_image
 from src.services.roles import all_roles, only_admin, admin_and_moder
@@ -24,7 +35,7 @@ async def upload_image(
     db: Session = Depends(get_db),
 ):
     public_id = CloudImage.generate_name_image(current_user.email)
-    upload_file = CloudImage.upload_image(file.file, public_id)
+    upload_file = CloudImage.upload_image(file.file, public_id, folder="fast_image")
     src_url = CloudImage.get_url_for_image(public_id, upload_file)
     image = await repository_image.add_image(
         db, src_url, public_id, current_user, description
@@ -67,7 +78,21 @@ async def get_image_url(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ):
-    image = repository_image.get_image_by_id(db, image_id)
+    image = await repository_image.get_image_by_id(db, image_id)
     if not image:
         raise HTTPException(status_code=404, detail=messages.IMAGE_NOT_FOUND)
     return {"url": image.url}
+
+
+@router.get(
+    "/", response_model=ImagesByFilter, dependencies=[Depends(all_roles)]
+)
+async def search_images(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth_service.get_current_user),
+    keyword: str = Query(default=None),
+    tag: str = Query(default=None),
+    min_rating: int = Query(default=None)
+):
+    all_images = await get_all_images(db, current_user, keyword, tag, min_rating)
+    return all_images
