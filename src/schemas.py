@@ -118,6 +118,7 @@ class CommentByUser(BaseModel):
 class ImageProfile(BaseModel):
     url: str
     description: str | None
+    average_rating: float | None
     tags: List[str] | None
     comments: List[CommentByUser] | None
 
@@ -155,3 +156,7 @@ class UserProfile(BaseModel):
 class AllUsersProfiles(BaseModel):
     model_config = SettingsConfigDict(from_attributes=True)
     users: List[UserProfile]
+
+
+class ImagesByFilter(BaseModel):
+    images: List[ImageProfile]

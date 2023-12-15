@@ -81,7 +81,7 @@ async def change_user_role(
 
 
 @router.get(
-    "/{user_name}", response_model=UserProfile, dependencies=[Depends(only_admin)]
+    "/{user_name}", response_model=UserProfile, dependencies=[Depends(all_roles)]
 )
 async def get_user_profile(
     user_name,
