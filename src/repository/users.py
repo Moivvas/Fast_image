@@ -16,7 +16,16 @@ async def get_user_by_email(email: str, db: Session) -> User | None:
 
 async def create_user(body: UserModel, db: Session) -> User:
     users = await get_users(db)
-    new_user = User(**body.model_dump(), avatar="avatar_url")
+    female_avatar_url = 'https://res.cloudinary.com/danwilik1/image/upload/v1702548197/fast_image/default_avatar/female_avatar_n0zwxx.jpg'
+    male_avatar_url = 'https://res.cloudinary.com/danwilik1/image/upload/v1702548197/fast_image/default_avatar/male_avatar_qjxr9h.jpg'
+    
+    new_user = User(
+        name=body.name,
+        email=body.email,
+        sex=body.sex,
+        password=body.password
+    )
+    new_user.avatar=female_avatar_url if body.sex == "female" else male_avatar_url,
     if not users:
         new_user.role = "admin"
     db.add(new_user)
