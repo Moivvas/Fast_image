@@ -1,5 +1,7 @@
+from typing import List
+
 from pydantic import BaseModel, EmailStr, Field, field_validator
-from datetime import date
+from datetime import datetime
 
 from pydantic_settings import SettingsConfigDict
 
@@ -110,3 +112,51 @@ class RatingResponse(BaseModel):
     user_id: int
     image_id: int
 
+    class Config:
+        orm_mode = True
+
+
+class CommentByUser(BaseModel):
+    user_id: int
+    comment: str
+
+
+class ImageProfile(BaseModel):
+    url: str
+    tags: List[str] | None
+    comments: List[CommentByUser] | None
+
+
+class UserInfoProfile(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
+    id: int
+    name: str
+    email: EmailStr
+    role: Role
+    avatar: str | None
+    forbidden: bool
+    created_at: datetime
+
+
+class UserProfileMe(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
+    name: str
+    email: EmailStr
+    avatar: str | None
+
+
+class ProfileMe(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
+    user: UserProfileMe
+    images: List[ImageProfile] | None
+
+
+class UserProfile(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
+    user: UserInfoProfile
+    images: List[ImageProfile] | None
+
+
+class AllUsersProfiles(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
+    users: List[UserProfile]
