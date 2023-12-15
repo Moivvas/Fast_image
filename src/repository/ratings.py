@@ -1,26 +1,29 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
 
 from src.database.models import Rating, User, Image
+from src.conf import messages
 
 
 async def create_rating(img_id: int, rate: int, db: Session, user: User):
-    self_image = db.query(Image).filter(Image.id == img_id).first().user_id == user.id
-    already_rated = db.query(Rating).filter(and_(Rating.image_id == img_id, Rating.user_id == user.id)).first()
-    image_exists = db.query(Image).filter(Image.id == img_id).first()
+    image = db.query(Image).filter(Image.id == img_id).first()
+    already_rated = db.query(Rating).filter(Image.id == img_id).first()
 
-    if self_image:
-        raise HTTPException(status_code=423, detail='You cannot rate your own images')
+    if image is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND)
+
+    if image.user_id == user.id:
+        raise HTTPException(status_code=status.HTTP_423_LOCKED, detail=messages.SELF_IMAGE_RATE)
     if already_rated:
-        raise HTTPException(status_code=423, detail='You cannot rate an image twice')
-    if image_exists:
-        new_rate = Rating(image_id=img_id, rate=rate, user_id=user.id)
-        db.add(new_rate)
-        db.commit()
-        db.refresh(new_rate)
-        return new_rate
+        raise HTTPException(status_code=status.HTTP_423_LOCKED, detail=messages.IMAGE_RATE_TWICE)
+
+    new_rate = Rating(image_id=img_id, rate=rate, user_id=user.id)
+    db.add(new_rate)
+    db.commit()
+    db.refresh(new_rate)
+    return new_rate
 
 
 async def del_rate(rate_id: int, db: Session, user: User):

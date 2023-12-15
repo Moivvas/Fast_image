@@ -114,7 +114,6 @@ class RatingResponse(BaseModel):
 
 
 
-
 class CommentByUser(BaseModel):
     user_id: int
     comment: str
