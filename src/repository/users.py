@@ -137,7 +137,7 @@ async def get_user_images_by_id(user_id: int, db: Session):
         for tag in image.tags:
             new_tag = tag.tag_name
             tags.append(new_tag)
-        new_image = ImageProfile(url=image.url, tags=tags, comments=comments)
+        new_image = ImageProfile(url=image.url, description=image.description, tags=tags, comments=comments)
         images.append(new_image)
     return images
 

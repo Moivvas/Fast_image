@@ -117,6 +117,7 @@ class CommentByUser(BaseModel):
 
 class ImageProfile(BaseModel):
     url: str
+    description: str | None
     tags: List[str] | None
     comments: List[CommentByUser] | None
 
