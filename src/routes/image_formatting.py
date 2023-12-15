@@ -11,7 +11,7 @@ from src.schemas import ImageAddResponse, ImageChangeSizeModel, ImageTransformMo
 from src.repository import cloud_image as repository_image
 from src.services.roles import all_roles, only_admin, admin_and_moder
 
-router = APIRouter(prefix="/images/formats", tags=["Image formats"])
+router = APIRouter(prefix="/formats", tags=["Image formats"])
 
 
 @router.post('/change_size', response_model=ImageAddResponse, status_code=status.HTTP_201_CREATED)
