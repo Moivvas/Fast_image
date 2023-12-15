@@ -48,7 +48,7 @@ class CloudImage:
 
     @staticmethod
     def get_url_for_image(public_id, upload_file) -> str:
-        src_url = cloudinary.CloudinaryImage(public_id).build_url()
+        src_url = upload_file.get("secure_url")
         return src_url
 
     def delete_img(self, public_id: str):
