@@ -44,7 +44,7 @@ async def create_user(body: UserModel, db: Session) -> User:
         sex=body.sex,
         password=body.password
     )
-    new_user.avatar=female_avatar_url if body.sex == "female" else male_avatar_url,
+    new_user.avatar = female_avatar_url if body.sex == "female" else male_avatar_url
     if not users:
         new_user.role = "admin"
     db.add(new_user)
@@ -137,7 +137,7 @@ async def get_user_images_by_id(user_id: int, db: Session):
         for tag in image.tags:
             new_tag = tag.tag_name
             tags.append(new_tag)
-        new_image = ImageProfile(url=image.url, tags=tags, comments=comments)
+        new_image = ImageProfile(url=image.url, description=image.description, tags=tags, comments=comments)
         images.append(new_image)
     return images
 

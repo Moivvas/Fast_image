@@ -107,8 +107,7 @@ class RatingResponse(BaseModel):
     user_id: int
     image_id: int
 
-    class Config:
-        orm_mode = True
+
 
 
 class CommentByUser(BaseModel):
@@ -118,6 +117,7 @@ class CommentByUser(BaseModel):
 
 class ImageProfile(BaseModel):
     url: str
+    description: str | None
     tags: List[str] | None
     comments: List[CommentByUser] | None
 
