@@ -31,12 +31,10 @@ async def get_tags(db: Session) -> List[Type[Tag]]:
 
 async def update_tag(tag_id: int, body: TagModel, db: Session) -> Tag | None:
     tag = await get_tag_by_id(tag_id, db)
-    if tag:
-        tag_new = db.query(Tag).filter(Tag.tag_name == body.tag_name.lower())
-        if tag_new:
-            return None
-        tag.tag_name = body.tag_name.lower()
-        db.commit()
+    if not tag:
+        return None
+    tag.tag_name = body.tag_name.lower()
+    db.commit()
     return tag
 
 
