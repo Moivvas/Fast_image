@@ -48,7 +48,7 @@ def client(session):
 
 
 @pytest.fixture(scope="module")
-def user():
+def user(session):
 
     return {
         "name": "deadpool",
@@ -57,7 +57,9 @@ def user():
         "id": 1,
         "avatar": "ava",
         "role": "admin",
+        "sex": "male"
     }
+
 
 @pytest.fixture(scope="module")
 def tag():

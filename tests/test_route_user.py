@@ -52,7 +52,7 @@ def test_users(user, session, client, token):
 def test_user_change_role(user, session, client, token):
     with patch.object(auth_service, "redis_db") as redis_mock:
         redis_mock.get.return_value = None
-        client.post("/project/auth/signup", json={"name": "Dima", "email": "exam@exam.com", "password": "qwerty"})
+        client.post("/project/auth/signup", json={"name": "Dima", "email": "exam@exam.com", "password": "qwerty", "sex": "male"})
 
         response = client.patch(
             "/project/users/user",

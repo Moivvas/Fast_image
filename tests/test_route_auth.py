@@ -6,10 +6,7 @@ from src.conf import messages
 
 @pytest.fixture()
 def refresh_token(client, user, session):
-    current_user: User = (
-        session.query(User).filter(User.email == user.get("email")).first()
-    )
-    session.commit()
+
     response = client.post(
         "/project/auth/login",
         data={"username": user.get("email"), "password": user.get("password")},
@@ -51,8 +48,7 @@ def test_repeat_create_user(client, user):
 
 
 def test_login_user(client, user, session):
-    current_user: User = session.query(User).filter(User.email == user.get("email")).first()
-    session.commit()
+    print(user)
     response = client.post("/project/auth/login", data={"username": user.get("email"), "password": user.get("password")})
     assert response.status_code == 200, response.text
     payload = response.json()
