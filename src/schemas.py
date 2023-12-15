@@ -107,8 +107,7 @@ class RatingResponse(BaseModel):
     user_id: int
     image_id: int
 
-    class Config:
-        orm_mode = True
+
 
 
 class CommentByUser(BaseModel):

@@ -29,7 +29,7 @@ class TestUsersRepository(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result, user)
 
     async def test_create_user(self):
-        body = UserModel(name="Dima", email="ex@ex.com", password="qwerty")
+        body = UserModel(name="Dima", email="ex@ex.com", password="qwerty", sex="male")
         result = await create_user(body, self.session)
         self.assertEqual(result.name, body.name)
         self.assertEqual(result.email, body.email)
