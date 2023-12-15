@@ -90,6 +90,11 @@ class ImageTransformModel(BaseModel):
     id: int
 
 
+class ImageQRResponse(BaseModel):
+    image_id: int
+    qr_code_url: str
+
+
 class AverageRatingResponse(BaseModel):
     average_rating: float
 
