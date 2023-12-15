@@ -16,18 +16,19 @@ from src.schemas import (
     CommentByUser,
     ImageProfile,
     ProfileMe,
+    AllUsersProfiles,
 )
 
 from src.repository import users as repository_users
-from src.services.roles import admin_and_moder, only_admin
+from src.services.roles import admin_and_moder, only_admin, all_roles
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.get("/me", response_model=ProfileMe)
+@router.get("/me", response_model=ProfileMe, dependencies=[Depends(all_roles)])
 async def read_users_me(
     current_user: User = Depends(auth_service.get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ) -> User:
     user_profile = await repository_users.get_user_profile_me(db, current_user)
     return user_profile
@@ -47,13 +48,13 @@ async def update_avatar_user(
 
 
 @router.get(
-    "/", response_model=list[UserResponse], dependencies=[Depends(admin_and_moder)]
+    "/", response_model=AllUsersProfiles, dependencies=[Depends(admin_and_moder)]
 )
-async def get_users(
+async def get_users_profiles(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
-) -> list[Type[User]]:
-    users = await repository_users.get_users(db)
+) -> AllUsersProfiles:
+    users = await repository_users.get_users_profiles(db, current_user)
     return users
 
 
@@ -79,7 +80,15 @@ async def change_user_role(
     return user
 
 
-@router.get("/{user_id}", response_model=UserProfile, dependencies=[Depends(only_admin)])
-async def get_user_profile(user_id, db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)):
-    user_profile = await repository_users.get_user_profile_by_id(user_id, db, current_user)
+@router.get(
+    "/{user_name}", response_model=UserProfile, dependencies=[Depends(only_admin)]
+)
+async def get_user_profile(
+    user_name,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth_service.get_current_user),
+):
+    user_profile = await repository_users.get_user_profile_by_name(
+        user_name, db, current_user
+    )
     return user_profile

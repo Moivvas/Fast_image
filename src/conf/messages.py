@@ -6,10 +6,10 @@ INVALID_PASSWORD = "Invalid password"
 INVALID_REFRESH_TOKEN = "Invalid refresh token"
 BANNED = "You are banned."
 USER_NOT_FOUND = "User not found."
-
 TAG_ALREADY_EXISTS = "Tag already exists"
 INVALID_TAG = "Invalid tag"
-
-IMAGE_NOT_FOUND ="Image not found"
-
+IMAGE_NOT_FOUND = "Image not found"
 RATE_NOT_FOUND = 'Rate not found'
+INVALID_SCOPE_FOR_TOKEN = "Invalid scope for token"
+COULD_NOT_VALIDATE_CREDENTIALS = "Could not validate credentials"
+USER_IS_NOT_AUTHORIZED = "User is not authorized"

@@ -121,17 +121,24 @@ class UserInfoProfile(BaseModel):
 
 
 class UserProfileMe(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
     name: str
     email: EmailStr
     avatar: str | None
 
 
 class ProfileMe(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
     user: UserProfileMe
     images: List[ImageProfile] | None
 
 
 class UserProfile(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
     user: UserInfoProfile
     images: List[ImageProfile] | None
 
+
+class AllUsersProfiles(BaseModel):
+    model_config = SettingsConfigDict(from_attributes=True)
+    users: List[UserProfile]
