@@ -3,11 +3,16 @@ from operator import or_
 from fastapi import HTTPException, status
 from sqlalchemy import func, desc
 from sqlalchemy.orm import Session
+
 from src.repository import ratings as repository_ratings
 
 from src.database.models import Image, User, Tag, Rating
 
-from src.services.cloud_images_service import image_cloudinary
+import qrcode
+from io import BytesIO
+from src.database.models import Image, User
+
+from src.services.cloud_images_service import CloudImage, image_cloudinary
 
 from src.schemas import (
     ImageChangeSizeModel,
@@ -18,6 +23,7 @@ from src.schemas import (
     CommentByUser,
     ImagesByFilter,
 )
+
 from src.conf import messages
 
 
@@ -149,6 +155,7 @@ async def black_white_image(body: ImageTransformModel, db: Session, user: User):
 
         return ImageAddResponse(image=image_model, detail=messages.BLACK_WHITE_ADDED)
     except Exception as e:
+
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
         )
@@ -199,3 +206,39 @@ async def get_all_images(
         images.append(new_image)
     all_images = ImagesByFilter(images=images)
     return all_images
+
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    
+
+async def create_qr(body: ImageTransformModel, db: Session, user: User):
+    try:
+        image = db.query(Image).filter(Image.id == body.id).first()
+        
+        if image is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND)
+        
+        qr = qrcode.QRCode()
+        qr.add_data(image.url)
+        qr.make(fit=True)
+        
+        qr_code_img = BytesIO()
+        qr.make_image(fill_color="black", back_color="white").save(qr_code_img, format='PNG')
+        
+        qr_code_img.seek(0)
+        
+        new_public_id = CloudImage.generate_name_image(user.email)
+        
+        upload_file = CloudImage.upload_image(qr_code_img, new_public_id, folder="qrcodes")
+
+        qr_code_url = CloudImage.get_url_for_image(new_public_id, upload_file)
+        
+        # Оновлення поля qr_url для існуючого об'єкту Image
+        image.qr_url = qr_code_url
+        
+        db.commit()  # Збереження оновлення поля qr_url
+        
+        return ImageQRResponse(image_id=image.id, qr_code_url=qr_code_url)
+    
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
