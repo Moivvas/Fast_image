@@ -24,7 +24,6 @@ from src.schemas import (
     CommentByUser,
     ImagesByFilter,
     ImageQRResponse,
-    AddTag,
     TagModel
 )
 
@@ -36,34 +35,34 @@ async def add_image(
 ):
     if not user:
         return None
-    db_image = Image(
+    image = Image(
         url=url, public_id=public_id, user_id=user.id, description=description
     )
-    db.add(db_image)
+    db.add(image)
     db.commit()
-    db.refresh(db_image)
-    return db_image
+    db.refresh(image)
+    return image
 
 
 async def delete_image(db: Session, id: int):
-    db_image = db.query(Image).filter(Image.id == id).first()
-    image_cloudinary.delete_img(db_image.public_id)
-    db.delete(db_image)
+    image = db.query(Image).filter(Image.id == id).first()
+    image_cloudinary.delete_img(image.public_id)
+    db.delete(image)
     db.commit()
-    return db_image
+    return image
 
 
 async def update_desc(db: Session, id: int, description=str):
-    db_image = db.query(Image).filter(Image.id == id).first()
-    db_image.description = description
+    image = db.query(Image).filter(Image.id == id).first()
+    image.description = description
     db.commit()
-    db.refresh(db_image)
-    return db_image
+    db.refresh(image)
+    return image
 
 
 async def get_image_by_id(db: Session, image_id: int) -> Image:
-    db_image = db.query(Image).filter(Image.id == image_id).first()
-    return db_image
+    image = db.query(Image).filter(Image.id == image_id).first()
+    return image
 
 
 async def change_size_image(body: ImageChangeSizeModel, db: Session, user: User):
@@ -247,6 +246,8 @@ async def add_tag(db: Session, user: User, image_id: int, tag_name: str):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND
         )
+    if image.user_id != user.id:
+        raise HTTPException(status_code=403, detail=messages.NOT_ALLOWED)
     if len(image.tags) >= 5:
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=messages.ONLY_FIVE_TAGS)
 
