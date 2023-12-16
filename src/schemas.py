@@ -99,7 +99,7 @@ class ImageQRResponse(BaseModel):
 
 class AddTag(BaseModel):
 
-    detail: str = "Image tags has been updated" | None
+    detail: str = "Image tags has been updated"
    
 
 

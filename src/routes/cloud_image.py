@@ -98,15 +98,10 @@ async def search_images(
     return all_images
 
 
-@router.patch("/tag",response_model=AddTag, dependencies=[Depends(all_roles)])
+@router.patch("/tag", dependencies=[Depends(all_roles)])
 async def add_tag(image_id: int,
                   tag: str,
                   db:Session = Depends(get_db),
                   current_user:User = Depends(auth_service.get_current_user)):
     response = await repository_image.add_tag(db, current_user, image_id, tag)
     return  response
-
-    # image = db.query(Image).filter(Image.id == image_id).first()
-    # tag = db.query(Tag).filter(Tag.tag_name == tag).first()
-    # image.tags.append(tag)
-    # db.commit()
