@@ -38,17 +38,7 @@ async def upload_image(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
-    if not current_user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=messages.USER_IS_NOT_AUTHORIZED,
-        )
-
-    if not file:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=messages.NO_FILES_PROVIDED
-        )
-
+    
     try:
         with db.begin():
             public_id = CloudImage.generate_name_image(current_user.email)
