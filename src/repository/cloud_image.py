@@ -11,6 +11,7 @@ from src.database.models import Image, User, Tag, Rating
 import qrcode
 from io import BytesIO
 from src.database.models import Image, User
+from src.repository.tags import create_tag
 
 from src.services.cloud_images_service import CloudImage, image_cloudinary
 
@@ -22,7 +23,9 @@ from src.schemas import (
     ImageProfile,
     CommentByUser,
     ImagesByFilter,
-    ImageQRResponse
+    ImageQRResponse,
+    AddTag,
+    TagModel
 )
 
 from src.conf import messages
@@ -236,7 +239,30 @@ async def create_qr(body: ImageTransformModel, db: Session, user: User):
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     
-    
 
+async def add_tag(db: Session, user: User, image_id: int, tag_name: str):
+    
+    image = db.query(Image).filter(Image.id == image_id).first()
+    if image is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND
+        )
+    if len(image.tags) >= 5:
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=messages.ONLY_FIVE_TAGS)
+
+    tag = db.query(Tag).filter(Tag.tag_name == tag_name.lower()).first()
+    if tag in image.tags:
+        return {"message": "Image has this tag", "tag": tag.tag_name}
+    
+    if tag is None:
+        tag_model = TagModel(tag_name=tag_name)
+        tag = await create_tag(tag_model, db)
+
+
+    image.tags.append(tag)
+    db.commit()
+    db.refresh(image)
+
+    return {"message": "Тег успішно додано", "tag": tag.tag_name}
 
 

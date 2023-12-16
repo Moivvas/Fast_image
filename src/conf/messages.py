@@ -8,6 +8,8 @@ BANNED = "You are banned."
 USER_NOT_FOUND = "User not found."
 TAG_ALREADY_EXISTS = "Tag already exists"
 INVALID_TAG = "Invalid tag"
+TAG_NOT_FOUND = "Tag not found"
+ONLY_FIVE_TAGS = "Only five tags allowed"
 
 IMAGE_NOT_FOUND = "Image not found"
 SELF_IMAGE_RATE = 'You cannot rate your own images'
