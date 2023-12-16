@@ -8,6 +8,8 @@ BANNED = "You are banned."
 USER_NOT_FOUND = "User not found."
 TAG_ALREADY_EXISTS = "Tag already exists"
 INVALID_TAG = "Invalid tag"
+TAG_NOT_FOUND = "Tag not found"
+ONLY_FIVE_TAGS = "Only five tags allowed"
 
 IMAGE_NOT_FOUND = "Image not found"
 
@@ -22,8 +24,14 @@ INVALID_SCOPE_FOR_TOKEN = "Invalid scope for token"
 COULD_NOT_VALIDATE_CREDENTIALS = "Could not validate credentials"
 USER_IS_NOT_AUTHORIZED = "User is not authorized"
 
+
 OWN_POST = "It`s not possible vote for own post."
 VOTE_TWICE = "It`s not possible to vote twice."
 NO_IMAGE_ID = 'No image with this ID.'
 NO_USER_WITH_IMAGES = 'No user has added a photo.'
 NO_ACCESS = 'Permission denied'
+
+NO_FILES_PROVIDED = "No file provided"
+NOT_AUTHORIZED_DELETE = "Not authorized to delete this image"
+NOT_ALLOWED = "Can`t update someones picture"
+NOT_AUTHORIZED_ACCESS = "Not authorized access"

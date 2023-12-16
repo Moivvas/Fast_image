@@ -98,6 +98,16 @@ class ImageQRResponse(BaseModel):
     qr_code_url: str
 
 
+class AddTag(BaseModel):
+
+    detail: str = "Image tags has been updated"
+   
+
+
+class AverageRatingResponse(BaseModel):
+    average_rating: float
+
+
 class RatingBase(BaseModel):
     rate: int
 
