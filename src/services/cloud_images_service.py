@@ -23,14 +23,10 @@ class CloudImage:
         return f"{name}_{unique_id}"
 
     @staticmethod
-    def _upload_image(file, public_id: str, folder: str) -> dict:
+    def upload_image(file, public_id: str, folder: str) -> dict:
         unique_public_id = CloudImage.generate_name_image(public_id)
         upload_file = cloudinary.uploader.upload(file, public_id=unique_public_id, folder=folder)
         return upload_file
-
-    @staticmethod
-    def upload_image(file, public_id: str, folder: str) -> dict:
-        return CloudImage._upload_image(file, public_id, folder)
 
     @staticmethod
     def get_url_for_image(public_id, upload_file) -> str:
