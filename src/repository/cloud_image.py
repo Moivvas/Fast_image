@@ -220,7 +220,9 @@ async def create_qr(body: ImageTransformModel, db: Session, user: User):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND
             )
-
+        if image.qr_url:
+            return ImageQRResponse(image_id=image.id, qr_code_url=qr_code_url)
+        
         qr = qrcode.QRCode()
         qr.add_data(image.url)
         qr.make(fit=True)

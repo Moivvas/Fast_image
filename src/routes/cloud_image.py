@@ -1,14 +1,19 @@
 from fastapi import APIRouter, HTTPException, UploadFile, status, File, Depends, Query
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
+
 from src.database.models import User
 from src.database.db import get_db
+
 from src.repository.cloud_image import get_all_images
 from src.repository import cloud_image as repository_image
+
 from src.services.auth import auth_service
 from src.services.cloud_images_service import CloudImage
 from src.services.roles import all_roles
+
 from src.conf import messages
+
 from src.schemas import (
     ImageDeleteResponse,
     ImageUpdateResponse,
@@ -93,10 +98,7 @@ async def delete_image(
         )
 
 
-from fastapi import HTTPException
-
-
-@router.put(
+@router.patch(
     "/{id}", response_model=ImageUpdateResponse, dependencies=[Depends(all_roles)]
 )
 async def update_description(
