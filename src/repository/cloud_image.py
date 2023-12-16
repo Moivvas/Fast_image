@@ -163,7 +163,7 @@ async def get_all_images(
     current_user: User,
     keyword: str = None,
     tag: str = None,
-    min_rating: int = None,
+    min_rating: float = None,
 ):
     query = db.query(Image)
     if keyword:
@@ -235,8 +235,3 @@ async def create_qr(body: ImageTransformModel, db: Session, user: User):
     
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-    
-    
-
-
-

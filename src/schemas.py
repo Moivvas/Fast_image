@@ -1,8 +1,9 @@
-from typing import List
+from typing import List, Any
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from datetime import datetime
 
+# from pydantic.main import Model
 from pydantic_settings import SettingsConfigDict
 
 from src.database.models import Role
@@ -97,21 +98,22 @@ class ImageQRResponse(BaseModel):
     qr_code_url: str
 
 
+class RatingBase(BaseModel):
+    rate: int
+
+
+class RatingModel(RatingBase):
+    id: int
+    image_id: int
+    user_id: int
+
+    class Config:
+        from_attributes = True
+
+
 class AverageRatingResponse(BaseModel):
     average_rating: float
-
-
-class RatingModel(BaseModel):
-    rate: int
-
-
-class RatingResponse(BaseModel):
-    model_config = SettingsConfigDict(from_attributes=True)
-    id: int
-    rate: int
-    user_id: int
-    image_id: int
-
+    image_url: str
 
 
 class CommentByUser(BaseModel):

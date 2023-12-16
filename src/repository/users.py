@@ -16,6 +16,7 @@ from src.schemas import (
 )
 from src.repository import ratings as repository_rating
 
+
 async def get_users(db: Session) -> list[Type[User]]:
     users = db.query(User).all()
     return users
