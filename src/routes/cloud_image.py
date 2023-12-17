@@ -42,8 +42,7 @@ async def upload_image(
 
     public_id = CloudImage.generate_name_image(current_user.email)
     upload_file = CloudImage.upload_image(
-        file.file, public_id, folder="fast_image"
-    )
+        file.file, public_id)
     src_url = CloudImage.get_url_for_image(public_id, upload_file)
     image = await repository_image.add_image(
         db, src_url, public_id, current_user, description
