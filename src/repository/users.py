@@ -98,6 +98,7 @@ async def change_user_role(body: ChangeRoleRequest, db: Session) -> User | None:
 async def get_user_profile_by_name(user_name: str, db: Session, current_user: User):
 
     user = await get_user_by_name(user_name, db)
+
     user_data = UserInfoProfile(
         id=user.id,
         name=user.name,
