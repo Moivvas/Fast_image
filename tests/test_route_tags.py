@@ -34,7 +34,7 @@ def test_create_tag(client, token):
         assert "id" in data
 
 
-def test_get_tag_by_id(client, token, session):
+def test_get_tag_by_id(client, token):
     with patch.object(auth_service, "redis_db") as redis_mock:
         redis_mock.get.return_value = None\
 
