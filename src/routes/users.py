@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Type, Union
 
 from fastapi import APIRouter, Depends, UploadFile, File
 from sqlalchemy.orm import Session, joinedload
@@ -92,3 +92,35 @@ async def get_user_profile(
         user_name, db, current_user
     )
     return user_profile
+
+
+@router.patch("/me/info", response_model=UserResponse, dependencies=[Depends(all_roles)])
+async def update_user_info(
+    new_name: str | None = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth_service.get_current_user),
+):
+    updated_user = await repository_users.update_user_profile_me_info(
+        user_id=current_user.id,
+        new_name=new_name,
+        db=db,
+        current_user=current_user,
+    )
+    return updated_user
+
+
+@router.patch("/me/credential", response_model=UserResponse, dependencies=[Depends(all_roles)])
+async def update_user_credential(
+    new_email: Union[str, None] = None,
+    new_password: Union[str, None] = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth_service.get_current_user),
+):
+    updated_user = await repository_users.update_user_profile_me_credential(
+        user_id=current_user.id,
+        new_email=new_email,
+        new_password=new_password,
+        db=db,
+        current_user=current_user,
+    )
+    return updated_user

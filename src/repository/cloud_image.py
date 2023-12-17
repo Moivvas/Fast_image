@@ -264,5 +264,3 @@ async def add_tag(db: Session, user: User, image_id: int, tag_name: str):
     db.refresh(image)
 
     return {"message": "Тег успішно додано", "tag": tag.tag_name}
-
-
