@@ -11,7 +11,8 @@ from src.routes import (auth,
                         cloud_image,
                         ratings,
                         image_formatting,
-                        qr_code)
+                        qr_code,
+                        comments)
 
 app = FastAPI()
 
@@ -42,3 +43,4 @@ app.include_router(cloud_image.router, prefix='/project')
 app.include_router(ratings.router, prefix='/project')
 app.include_router(image_formatting.router, prefix='/project')
 app.include_router(qr_code.router, prefix='/project')
+app.include_router(comments.router, prefix='/project')

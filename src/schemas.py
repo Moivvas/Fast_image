@@ -3,6 +3,7 @@ from typing import List
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from datetime import datetime
 
+from fastapi import Path
 from pydantic_settings import SettingsConfigDict
 
 from src.database.models import Role
@@ -169,3 +170,31 @@ class AllUsersProfiles(BaseModel):
 
 class ImagesByFilter(BaseModel):
     images: List[ImageProfile]
+
+
+class UserDb(BaseModel):
+    id: int
+    email: EmailStr
+    created_at: datetime
+    role: Role = Field()
+
+
+class CommentDeleteResponse(BaseModel):
+    id: int = 1
+    comment: str = 'My comment'
+
+
+class CommentResponse(BaseModel):
+    id: int = 1
+    comment: str
+    image_id: int = 1
+
+
+class CommentModel(BaseModel):
+    comment: str = Field(min_length=1, max_length=255)
+    image_id: int = Field(1, gt=0)
+
+
+class CommentModelUpdate(BaseModel):
+    comment: str = Field(min_length=1, max_length=255)
+    comment_id: int = Path(ge=1)
