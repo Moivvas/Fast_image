@@ -198,47 +198,40 @@ async def get_all_images(
 
 
 async def create_qr(body: ImageTransformModel, db: Session, user: User):
-    try:
-        image = db.query(Image).filter(Image.id == body.id).first()
+    image = db.query(Image).filter(Image.id == body.id).first()
 
-        if image is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND
-            )
-        if image.qr_url:
-            return ImageQRResponse(image_id=image.id, qr_code_url="")
-        
-        qr = qrcode.QRCode()
-        qr.add_data(image.url)
-        qr.make(fit=True)
-
-        qr_code_img = BytesIO()
-        qr.make_image(fill_color="black", back_color="white").save(
-            qr_code_img
-        )
-
-        qr_code_img.seek(0)
-
-        new_public_id = CloudImage.generate_name_image(user.email)
-
-        upload_file = CloudImage.upload_image(
-            qr_code_img, new_public_id)
-
-        qr_code_url = CloudImage.get_url_for_image(new_public_id, upload_file)
-
-        image.qr_url = qr_code_url
-
-        db.commit()
-
-        return ImageQRResponse(image_id=image.id, qr_code_url=qr_code_url)
-
-    except Exception as e:
-
+    if image is None:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND
         )
+    if image.qr_url:
+        return ImageQRResponse(image_id=image.id, qr_code_url="")
+    
+    qr = qrcode.QRCode()
+    qr.add_data(image.url)
+    qr.make(fit=True)
 
+    qr_code_img = BytesIO()
+    qr.make_image(fill_color="black", back_color="white").save(
+        qr_code_img
+    )
 
+    qr_code_img.seek(0)
+
+    new_public_id = CloudImage.generate_name_image(user.email)
+
+    upload_file = CloudImage.upload_image(
+        qr_code_img, new_public_id)
+
+    qr_code_url = CloudImage.get_url_for_image(new_public_id, upload_file)
+
+    image.qr_url = qr_code_url
+
+    db.commit()
+
+    return ImageQRResponse(image_id=image.id, qr_code_url=qr_code_url)
+
+    
 async def add_tag(db: Session, user: User, image_id: int, tag_name: str):
     image = db.query(Image).filter(Image.id == image_id).first()
     if image is None:

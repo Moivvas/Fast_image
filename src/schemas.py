@@ -15,6 +15,14 @@ class UserModel(BaseModel):
     sex: str
     password: str = Field(min_length=6, max_length=16)
 
+    @field_validator("sex")
+    def validate_role(cls, v):
+        allowed_sex = {"male", "female"}
+        if v not in allowed_sex:
+            raise ValueError(
+                f"Invalid sex. Allowed sex are: {', '.join(allowed_sex)}"
+            )
+        return v
 
 class UserResponse(BaseModel):
     model_config = SettingsConfigDict(from_attributes=True)
