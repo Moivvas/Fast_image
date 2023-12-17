@@ -159,16 +159,11 @@ async def get_all_images(
     current_user: User,
     keyword: str = None,
     tag: str = None,
-    min_rating: int = None,
+    min_rating: float = None,
 ):
     query = db.query(Image)
     if keyword:
-        query = query.filter(
-            or_(
-                Image.image_name.ilike(f"%{keyword}%"),
-                Image.description.ilike(f"%{keyword}%"),
-            )
-        )
+        query = query.filter(Image.description.ilike(f"%{keyword}%"))
     if tag:
         query = query.filter(Image.tags.any(Tag.tag_name == tag))
     if min_rating is not None:
@@ -189,10 +184,11 @@ async def get_all_images(
             new_tag = tag.tag_name
             tags.append(new_tag)
         rating = await repository_ratings.calculate_rating(image.id, db, current_user)
+        new_rating = rating['average_rating']
         new_image = ImageProfile(
             url=image.url,
             description=image.description,
-            average_rating=rating,
+            average_rating=new_rating,
             tags=tags,
             comments=comments,
         )

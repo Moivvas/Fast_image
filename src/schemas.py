@@ -128,7 +128,7 @@ class RatingModel(RatingBase):
 
 class AverageRatingResponse(BaseModel):
     average_rating: float
-    image_url: str
+
 
 
 class CommentByUser(BaseModel):
