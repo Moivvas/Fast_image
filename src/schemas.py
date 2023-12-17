@@ -103,7 +103,6 @@ class AddTag(BaseModel):
     detail: str = "Image tags has been updated"
    
 
-
 class AverageRatingResponse(BaseModel):
     average_rating: float
 
