@@ -36,7 +36,7 @@ async def get_tag_by_id(tag_id: int,
     return tag
 
 
-@router.get("/{tag_name}", response_model=TagResponse)
+@router.get("/get/{tag_name}", response_model=TagResponse)
 async def get_tag_by_name(tag_name: str,
                           db: Session = Depends(get_db),
                           current_user: User = Depends(auth_service.get_current_user)) -> Tag | None:

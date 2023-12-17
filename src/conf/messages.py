@@ -35,7 +35,8 @@ NO_FILES_PROVIDED = "No file provided"
 
 NO_COMMENT = "No such comment"
 NO_IMAGE = "No such image"
-CANT_CHANGE_COMMENT = "You can't change not your comment"NO_FILES_PROVIDED = "No file provided"
+CANT_CHANGE_COMMENT = "You can't change not your comment"
+NO_FILES_PROVIDED = "No file provided"
 
 NOT_AUTHORIZED_DELETE = "Not authorized to delete this image"
 NOT_ALLOWED = "Can`t update someones picture"

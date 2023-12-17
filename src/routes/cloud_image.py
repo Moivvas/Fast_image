@@ -138,7 +138,7 @@ async def search_images(
     current_user: User = Depends(auth_service.get_current_user),
     keyword: str = Query(default=None),
     tag: str = Query(default=None),
-    min_rating: int = Query(default=None),
+    min_rating = Query(default=None),
 ):
     try:
         all_images = await get_all_images(db, current_user, keyword, tag, min_rating)

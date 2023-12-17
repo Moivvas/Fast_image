@@ -143,7 +143,8 @@ async def get_user_images_by_id(user_id: int, db: Session, current_user: User):
             new_tag = tag.tag_name
             tags.append(new_tag)
         rating = await repository_rating.calculate_rating(image.id, db, current_user)
-        new_image = ImageProfile(url=image.url, description=image.description, average_rating=rating, tags=tags, comments=comments)
+        new_rating = rating['average_rating']
+        new_image = ImageProfile(url=image.url, description=image.description, average_rating=new_rating, tags=tags, comments=comments)
         images.append(new_image)
     return images
 
