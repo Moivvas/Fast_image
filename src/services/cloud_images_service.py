@@ -1,5 +1,5 @@
 import hashlib
-
+import datetime
 import cloudinary
 import cloudinary.uploader
 
@@ -18,7 +18,8 @@ class CloudImage:
     @staticmethod
     def generate_name_image(email: str) -> str:
         name = hashlib.sha256(email.encode("utf-8")).hexdigest()[:12]
-        return f"fast_image/{name}"
+        time = datetime.datetime.now()
+        return f"fast_image/{name}{time}"
 
     @staticmethod
     def upload_image(file, public_id: str) -> dict:

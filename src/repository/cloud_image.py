@@ -226,8 +226,7 @@ async def create_qr(body: ImageTransformModel, db: Session, user: User):
         new_public_id = CloudImage.generate_name_image(user.email)
 
         upload_file = CloudImage.upload_image(
-            qr_code_img, new_public_id, folder="qrcodes"
-        )
+            qr_code_img, new_public_id)
 
         qr_code_url = CloudImage.get_url_for_image(new_public_id, upload_file)
 
