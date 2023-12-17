@@ -15,6 +15,7 @@ from src.services.roles import all_roles
 from src.conf import messages
 
 from src.schemas import (
+    AddTag,
     ImageDeleteResponse,
     ImageUpdateResponse,
     ImageURLResponse,
@@ -147,15 +148,18 @@ async def search_images(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.patch("/tag", dependencies=[Depends(all_roles)])
+@router.patch("/", response_model= AddTag, dependencies=[Depends(all_roles)])
 async def add_tag(
     image_id: int,
     tag: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ):
-    try:
-        response = await repository_image.add_tag(db, current_user, image_id, tag)
-        return response
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    # try:
+    print('route before')
+    response = await repository_image.add_tag(db, current_user, image_id, tag)
+    print('route after')
+
+    return response
+    # except SQLAlchemyError as e:
+    #     raise HTTPException(status_code=500, detail=str(e))
