@@ -68,9 +68,8 @@ async def delete_image(
             )
 
         if current_user.role == "admin" or image.user_id == current_user.id:
-            with db.begin():
-                deleted_image = await repository_image.delete_image(db, id)
-                return deleted_image
+            deleted_image = await repository_image.delete_image(db, id)
+            return deleted_image
         else:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
