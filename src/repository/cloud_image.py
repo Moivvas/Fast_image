@@ -170,7 +170,7 @@ async def get_all_images(
     current_user: User,
     keyword: str = None,
     tag: str = None,
-    min_rating: float = None,
+    min_rating: int = None,
 ):
     query = db.query(Image)
     if keyword:

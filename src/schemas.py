@@ -3,7 +3,6 @@ from typing import List, Any
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from datetime import datetime
 
-# from pydantic.main import Model
 from pydantic_settings import SettingsConfigDict
 
 from src.database.models import Role
