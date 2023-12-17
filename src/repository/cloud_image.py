@@ -250,8 +250,6 @@ async def add_tag(db: Session, user: User, image_id: int, tag_name: str):
     print(image.tags)
     print(type(image.tags))
 
-    # if tag_name in image.tags:
-    #     return {"message": "Image has this tag", "tag": tag.tag_name}
     if tag is None:
         tag_model = TagModel(tag_name=tag_name)
         tag = await create_tag(tag_model, db)
