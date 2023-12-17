@@ -1,11 +1,9 @@
 import hashlib
-import uuid
-
+import datetime
 import cloudinary
 import cloudinary.uploader
 
 from src.conf.config import settings
-from src.conf import messages
 
 
 class CloudImage:
@@ -16,21 +14,23 @@ class CloudImage:
         secure=True,
     )
 
+
     @staticmethod
     def generate_name_image(email: str) -> str:
         name = hashlib.sha256(email.encode("utf-8")).hexdigest()[:12]
-        unique_id = uuid.uuid4().hex
-        return f"{name}_{unique_id}"
+        time = datetime.datetime.now()
+        return f"fast_image/{name}{time}"
 
     @staticmethod
-    def upload_image(file, public_id: str, folder: str) -> dict:
-        unique_public_id = CloudImage.generate_name_image(public_id)
-        upload_file = cloudinary.uploader.upload(file, public_id=unique_public_id, folder=folder)
+    def upload_image(file, public_id: str) -> dict:
+        upload_file = cloudinary.uploader.upload(file, public_id=public_id)
         return upload_file
 
     @staticmethod
     def get_url_for_image(public_id, upload_file) -> str:
-        src_url = upload_file.get("secure_url")
+        src_url = cloudinary.CloudinaryImage(public_id).build_url(
+            width=250, height=250, crop="fill", version=upload_file.get("version")
+        )
         return src_url
 
     def delete_img(self, public_id: str):
@@ -38,25 +38,8 @@ class CloudImage:
         return f"{public_id} deleted"
 
 
+    async def change_size(self, public_id: str, width: int) -> str:
 
-    @staticmethod
-    def _wrapper(func):
-        async def wrapped_func(*args, **kwargs):
-            try:
-                result = await func(*args, **kwargs)
-                return result
-            except (cloudinary.api.Error, cloudinary.exceptions.Error) as e:
-                print(messages.CLOUDINARY_API_ERROR, e.message)
-                return None, None
-            except Exception as e:
-                print(messages.UNEXPECTED_ERROR, str(e))
-                return None, None
-
-        return wrapped_func
-
-    @_wrapper
-    @staticmethod
-    async def change_size(public_id: str, width: int) -> str:
         img = cloudinary.CloudinaryImage(public_id).image(
             transformation=[{"width": width, "crop": "pad"}]
         )
@@ -65,19 +48,17 @@ class CloudImage:
         return upload_image["url"], upload_image["public_id"]
 
 
+    async def fade_edges_image(self, public_id: str, effect: str = "vignette") -> str:
 
-    @_wrapper
-    @staticmethod
-    async def fade_edges_image(public_id: str, effect: str = "vignette") -> str:
         img = cloudinary.CloudinaryImage(public_id).image(effect=effect)
         url = img.split('"')
         upload_image = cloudinary.uploader.upload(url[1], folder="fast_image")
         return upload_image["url"], upload_image["public_id"]
 
-      
-    @_wrapper
-    @staticmethod
-    async def make_black_white_image(public_id: str, effect: str = "art:audrey") -> str:
+
+    async def make_black_white_image(
+        self, public_id: str, effect: str = "art:audrey"
+    ) -> str:
         img = cloudinary.CloudinaryImage(public_id).image(effect=effect)
         url = img.split('"')
         upload_image = cloudinary.uploader.upload(url[1], folder="fast_image")

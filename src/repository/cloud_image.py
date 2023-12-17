@@ -44,16 +44,16 @@ async def add_image(
     return image
 
 
-async def delete_image(db: Session, id: int):
-    image = db.query(Image).filter(Image.id == id).first()
+async def delete_image(db: Session, image_id: int):
+    image = db.query(Image).filter(Image.id == image_id).first()
     image_cloudinary.delete_img(image.public_id)
     db.delete(image)
     db.commit()
     return image
 
 
-async def update_desc(db: Session, id: int, description=str):
-    image = db.query(Image).filter(Image.id == id).first()
+async def update_desc(db: Session, image_id: int, description=str):
+    image = db.query(Image).filter(Image.id == image_id).first()
     image.description = description
     db.commit()
     db.refresh(image)
@@ -66,103 +66,92 @@ async def get_image_by_id(db: Session, image_id: int) -> Image:
 
 
 async def change_size_image(body: ImageChangeSizeModel, db: Session, user: User):
-    try:
-        image = db.query(Image).filter(Image.id == body.id).first()
-        if image.user_id != user.id:
-            raise HTTPException(status_code=403, detail=messages.NOT_ALLOWED)
-        if image is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND
-            )
-        url, public_id = await image_cloudinary.change_size(image.public_id, body.width)
-        new_image = Image(
-            url=url, public_id=public_id, user_id=user.id, description=image.description
-        )
-        db.add(new_image)
-        db.commit()
-        db.refresh(new_image)
-        image_model = ImageModel(
-            id=new_image.id,
-            url=new_image.url,
-            public_id=new_image.public_id,
-            user_id=new_image.user_id,
-        )
-        return ImageAddResponse(image=image_model, detail=messages.IMAGE_RESIZED_ADDED)
-    except Exception as e:
+    
+    image = db.query(Image).filter(Image.id == body.id).first()
+    if image is None:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND)
+    if image.user_id != user.id:
+        raise HTTPException(status_code=403, detail=messages.NOT_ALLOWED)
+
+    url, public_id = await image_cloudinary.change_size(image.public_id, body.width)
+    new_image = Image(
+        url=url, public_id=public_id, user_id=user.id, description=image.description
+    )
+    db.add(new_image)
+    db.commit()
+    db.refresh(new_image)
+    image_model = ImageModel(
+        id=new_image.id,
+        url=new_image.url,
+        public_id=new_image.public_id,
+        user_id=new_image.user_id,
+    )
+    return ImageAddResponse(image=image_model, detail=messages.IMAGE_RESIZED_ADDED)
+    
 
 
 async def fade_edges_image(body: ImageTransformModel, db: Session, user: User):
-    try:
-        image = db.query(Image).filter(Image.id == body.id).first()
-        if image.user_id != user.id:
-            raise HTTPException(status_code=403, detail=messages.NOT_ALLOWED)
-        if image is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND
-            )
-
-        url, public_id = await image_cloudinary.fade_edges_image(
-            public_id=image.public_id
-        )
-
-        new_image = Image(
-            url=url, public_id=public_id, user_id=user.id, description=image.description
-        )
-        db.add(new_image)
-        db.commit()
-        db.refresh(new_image)
-
-        image_model = ImageModel(
-            id=new_image.id,
-            url=new_image.url,
-            public_id=new_image.public_id,
-            user_id=new_image.user_id,
-        )
-
-        return ImageAddResponse(image=image_model, detail=messages.IMAGE_FADE_ADDED)
-    except Exception as e:
+    image = db.query(Image).filter(Image.id == body.id).first()
+    if image is None:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND
         )
+
+    if image.user_id != user.id:
+        raise HTTPException(status_code=403, detail=messages.NOT_ALLOWED)
+    
+    url, public_id = await image_cloudinary.fade_edges_image(
+        public_id=image.public_id
+    )
+
+    new_image = Image(
+        url=url, public_id=public_id, user_id=user.id, description=image.description
+    )
+    db.add(new_image)
+    db.commit()
+    db.refresh(new_image)
+
+    image_model = ImageModel(
+        id=new_image.id,
+        url=new_image.url,
+        public_id=new_image.public_id,
+        user_id=new_image.user_id,
+    )
+
+    return ImageAddResponse(image=image_model, detail=messages.IMAGE_FADE_ADDED)
 
 
 async def black_white_image(body: ImageTransformModel, db: Session, user: User):
-    try:
-        image = db.query(Image).filter(Image.id == body.id).first()
-        if image.user_id != user.id:
-            raise HTTPException(status_code=403, detail=messages.NOT_ALLOWED)
-        if image is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND
-            )
-
-        url, public_id = await image_cloudinary.make_black_white_image(
-            public_id=image.public_id
-        )
-
-        new_image = Image(
-            url=url, public_id=public_id, user_id=user.id, description=image.description
-        )
-
-        db.add(new_image)
-        db.commit()
-        db.refresh(new_image)
-
-        image_model = ImageModel(
-            id=new_image.id,
-            url=new_image.url,
-            public_id=new_image.public_id,
-            user_id=new_image.user_id,
-        )
-
-        return ImageAddResponse(image=image_model, detail=messages.BLACK_WHITE_ADDED)
-    except Exception as e:
+    image = db.query(Image).filter(Image.id == body.id).first()
+    if image is None:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND
         )
+    if image.user_id != user.id:
+        raise HTTPException(status_code=403, detail=messages.NOT_ALLOWED)
+    
+
+    url, public_id = await image_cloudinary.make_black_white_image(
+        public_id=image.public_id
+    )
+
+    new_image = Image(
+        url=url, public_id=public_id, user_id=user.id, description=image.description
+    )
+
+    db.add(new_image)
+    db.commit()
+    db.refresh(new_image)
+
+    image_model = ImageModel(
+        id=new_image.id,
+        url=new_image.url,
+        public_id=new_image.public_id,
+        user_id=new_image.user_id,
+    )
+
+    return ImageAddResponse(image=image_model, detail=messages.BLACK_WHITE_ADDED)
 
 
 async def get_all_images(
@@ -237,8 +226,7 @@ async def create_qr(body: ImageTransformModel, db: Session, user: User):
         new_public_id = CloudImage.generate_name_image(user.email)
 
         upload_file = CloudImage.upload_image(
-            qr_code_img, new_public_id, folder="qrcodes"
-        )
+            qr_code_img, new_public_id)
 
         qr_code_url = CloudImage.get_url_for_image(new_public_id, upload_file)
 

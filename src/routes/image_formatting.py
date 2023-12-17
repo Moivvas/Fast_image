@@ -44,3 +44,4 @@ async def black_white_image(body: ImageTransformModel,
     if image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND)
     return image
+
