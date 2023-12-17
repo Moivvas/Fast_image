@@ -95,6 +95,7 @@ async def change_user_role(body: ChangeRoleRequest, db: Session) -> User | None:
 async def get_user_profile_by_name(user_name: str, db: Session, current_user: User):
 
     user = await get_user_by_name(user_name, db)
+
     user_data = UserInfoProfile(
         id=user.id,
         name=user.name,
@@ -104,7 +105,7 @@ async def get_user_profile_by_name(user_name: str, db: Session, current_user: Us
         forbidden=user.forbidden,
         created_at=user.created_at
     )
-    images = await get_user_images_by_id(user.id, db)
+    images = await get_user_images_by_id(user.id, db, current_user)
     user_profile = UserProfile(user=user_data, images=images)
     return user_profile
 
