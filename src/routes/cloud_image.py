@@ -27,7 +27,7 @@ router = APIRouter(prefix="/images", tags=["cloudinary_image"])
 
 
 @router.post(
-    "/image",
+    "/",
     response_model=ImageModel,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(all_roles)],

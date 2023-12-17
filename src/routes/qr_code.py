@@ -16,7 +16,7 @@ router = APIRouter(prefix="/qr_code", tags=["Create QRcode"])
 
 
 @router.post('/create_qr', response_model=ImageQRResponse, status_code=status.HTTP_201_CREATED)
-async def fade_edges_image(body: ImageTransformModel,
+async def create_qr(body: ImageTransformModel,
                            db: Session = Depends(get_db),
                            current_user: User = Depends(auth_service.get_current_user)):
    
