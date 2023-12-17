@@ -1,8 +1,9 @@
 from typing import Type
 
-from fastapi import APIRouter, Depends, UploadFile, File
+from fastapi import APIRouter, Depends, UploadFile, File, status, HTTPException
 from sqlalchemy.orm import Session, joinedload
 
+from src.conf import messages
 from src.database.models import User, Image, Comment
 from src.database.db import get_db
 
@@ -34,7 +35,7 @@ async def read_users_me(
     return user_profile
 
 
-@router.patch("/avatar", response_model=UserResponse)
+@router.patch("/avatar", response_model=UserResponse, dependencies=[Depends(all_roles)])
 async def update_avatar_user(
     file: UploadFile = File(),
     current_user: User = Depends(auth_service.get_current_user),
@@ -59,7 +60,7 @@ async def get_users_profiles(
 
 
 @router.get(
-    "/user", response_model=UserResponse, dependencies=[Depends(admin_and_moder)]
+    "/user/{email}", response_model=UserResponse, dependencies=[Depends(admin_and_moder)]
 )
 async def get_user(
     email: str,
@@ -67,6 +68,10 @@ async def get_user(
     current_user: User = Depends(auth_service.get_current_user),
 ) -> User:
     user = await repository_users.get_user_by_email(email, db)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.USER_NOT_FOUND
+        )
     return user
 
 
@@ -77,6 +82,10 @@ async def change_user_role(
     current_user: User = Depends(auth_service.get_current_user),
 ) -> User:
     user = await repository_users.change_user_role(body, db)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.USER_NOT_FOUND
+        )
     return user
 
 
