@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from src.database.models import Comment, Image, User
+from src.database.models import Comment, User
 from src.schemas import CommentModel
 from src.conf import messages
 
@@ -19,13 +19,13 @@ async def get_comment_by_id(comment_id: int, db: Session):
 
 
 async def create_comment(body: CommentModel, current_user: User, db: Session):
-    comment = Comment(**body.dict(), user_id=current_user.id)
+    comment = Comment(**body.model_dump(), user_id=current_user.id)
     db.add(comment)
     db.commit()
     return comment
 
 
-async def update_comment(body: CommentModel, db: Session, current_user: User, dependencies=[Depends(admin_and_moder)]):
+async def update_comment(body: CommentModel, db: Session, current_user: User):
     comment = await get_comment_by_id(body.comment_id, db)
     if not comment:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,  detail=messages.NO_COMMENT)

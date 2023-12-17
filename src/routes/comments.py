@@ -1,13 +1,13 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException, Depends, status, Path, Security, UploadFile, File
-from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import APIRouter, HTTPException, Depends, status, Path
+from fastapi.security import HTTPBearer
 from sqlalchemy.orm import Session
 from src.services.auth import auth_service
 
 from src.database.db import get_db
 from src.database.models import Image, User
-from src.services.roles import admin_and_moder, only_admin, all_roles
+from src.services.roles import admin_and_moder, only_admin
 
 from src.schemas import CommentResponse, CommentModel, CommentDeleteResponse, CommentModelUpdate
 from src.repository import comments as repository_comments
@@ -29,7 +29,7 @@ async def create_comment(body: CommentModel, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)):
     image = db.query(Image).filter_by(id=body.image_id).first()
     if not image:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, messages=messages.NO_IMAGE)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail = messages.NO_IMAGE)
     comment = await repository_comments.create_comment(body, current_user, db)
     return comment
 
