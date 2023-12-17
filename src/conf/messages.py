@@ -23,3 +23,7 @@ BLACK_WHITE_ADDED = "Black and white image has been added"
 INVALID_SCOPE_FOR_TOKEN = "Invalid scope for token"
 COULD_NOT_VALIDATE_CREDENTIALS = "Could not validate credentials"
 USER_IS_NOT_AUTHORIZED = "User is not authorized"
+
+NO_COMMENT = "No such comment"
+NO_IMAGE = "No such image"
+CANT_CHANGE_COMMENT = "You can't change not your comment"
