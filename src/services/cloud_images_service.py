@@ -38,7 +38,6 @@ class CloudImage:
         return f"{public_id} deleted"
 
     async def change_size(self, public_id: str, width: int) -> str:
-        # try:
         img = cloudinary.CloudinaryImage(public_id).image(
             transformation=[{"width": width, "crop": "pad"}]
         )
@@ -48,7 +47,6 @@ class CloudImage:
 
 
     async def fade_edges_image(self, public_id: str, effect: str = "vignette") -> str:
-        # try:
         img = cloudinary.CloudinaryImage(public_id).image(effect=effect)
         url = img.split('"')
         upload_image = cloudinary.uploader.upload(url[1], folder="fast_image")
@@ -58,7 +56,6 @@ class CloudImage:
     async def make_black_white_image(
         self, public_id: str, effect: str = "art:audrey"
     ) -> str:
-        # try:
         img = cloudinary.CloudinaryImage(public_id).image(effect=effect)
         url = img.split('"')
         upload_image = cloudinary.uploader.upload(url[1], folder="fast_image")
