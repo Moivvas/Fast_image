@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from datetime import datetime
@@ -103,21 +103,24 @@ class AddTag(BaseModel):
     detail: str = "Image tags has been updated"
    
 
-
 class AverageRatingResponse(BaseModel):
     average_rating: float
 
 
-class RatingModel(BaseModel):
+class RatingBase(BaseModel):
     rate: int
 
 
-class RatingResponse(BaseModel):
-    model_config = SettingsConfigDict(from_attributes=True)
+class RatingModel(RatingBase):
     id: int
-    rate: int
-    user_id: int
     image_id: int
+    user_id: int
+    model_config = SettingsConfigDict(from_attributes=True)
+
+
+class AverageRatingResponse(BaseModel):
+    average_rating: float
+    image_url: str
 
 
 class CommentByUser(BaseModel):

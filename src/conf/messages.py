@@ -13,11 +13,9 @@ TAG_NOT_FOUND = "Tag not found"
 ONLY_FIVE_TAGS = "Only five tags allowed"
 
 IMAGE_NOT_FOUND = "Image not found"
-SELF_IMAGE_RATE = 'You cannot rate your own images'
-IMAGE_RATE_TWICE = 'You cannot rate an image twice'
 
 RATE_NOT_FOUND = 'Rate not found'
-UNEXPECTED_ERROR ="Unexpected Error:"
+UNEXPECTED_ERROR = "Unexpected Error:"
 CLOUDINARY_ERROR = "Cloudinary Error:"
 CLOUDINARY_API_ERROR = "Cloudinary API Error:"
 IMAGE_RESIZED_ADDED = "Image has been resized and added"
@@ -27,9 +25,18 @@ INVALID_SCOPE_FOR_TOKEN = "Invalid scope for token"
 COULD_NOT_VALIDATE_CREDENTIALS = "Could not validate credentials"
 USER_IS_NOT_AUTHORIZED = "User is not authorized"
 
+OWN_POST = "It`s not possible vote for own post."
+VOTE_TWICE = "It`s not possible to vote twice."
+NO_IMAGE_ID = 'No image with this ID.'
+NO_USER_WITH_IMAGES = 'No user has added a photo.'
+NO_ACCESS = 'Permission denied'
+
+NO_FILES_PROVIDED = "No file provided"
+
 NO_COMMENT = "No such comment"
 NO_IMAGE = "No such image"
 CANT_CHANGE_COMMENT = "You can't change not your comment"NO_FILES_PROVIDED = "No file provided"
+
 NOT_AUTHORIZED_DELETE = "Not authorized to delete this image"
 NOT_ALLOWED = "Can`t update someones picture"
 NOT_AUTHORIZED_ACCESS = "Not authorized access"

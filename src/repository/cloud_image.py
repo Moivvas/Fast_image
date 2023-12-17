@@ -237,6 +237,7 @@ async def create_qr(body: ImageTransformModel, db: Session, user: User):
         return ImageQRResponse(image_id=image.id, qr_code_url=qr_code_url)
 
     except Exception as e:
+
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
         )

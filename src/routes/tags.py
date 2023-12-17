@@ -54,7 +54,10 @@ async def get_all_tags(db: Session = Depends(get_db),
     
 
 @router.patch("/{tag_id}", response_model=TagResponse)
-async def update_tag(tag_id: int, body: TagModel, db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)) -> Tag | None:
+async def update_tag(tag_id: int,
+                     body: TagModel,
+                     db: Session = Depends(get_db),
+                     current_user: User = Depends(auth_service.get_current_user)) -> Tag | None:
     tag = await repo_tags.update_tag(tag_id, body, db)
     if tag is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.INVALID_TAG)
