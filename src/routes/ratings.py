@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Path, HTTPException, status
 
 from src.database.models import User, Role
 from src.repository import ratings as repository_ratings
-from src.schemas import RatingModel, AverageRatingResponse, ImageModel
+from src.schemas import RatingModel, AverageRatingResponse, ImageModel, RatingResponse
 from src.database.db import get_db
 from src.services.auth import auth_service
 from src.services.roles import RoleAccess
@@ -34,7 +34,7 @@ async def create_rate(image_id: int,
 
 
 @router.get('/average_rate/{image_id}',
-            response_model=AverageRatingResponse,
+            response_model=RatingResponse,
             dependencies=[Depends(get_all_ratings)])
 async def image_by_rating(image_id: int,
                           db: Session = Depends(get_db),

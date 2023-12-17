@@ -48,7 +48,6 @@ async def delete_rate(rate_id: int, db: Session, user: User) -> Type[Rating]:
 async def calculate_rating(image_id: int, db: Session, user: User):
     all_ratings = db.query(func.avg(Rating.rate)).filter(Rating.image_id == image_id).scalar()
     image_url = db.query(Image.url).filter(Image.id == image_id).scalar()
-    print(image_url)
     return {'average_rating': all_ratings, 'image_url': str(image_url)}
 
 

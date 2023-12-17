@@ -115,6 +115,11 @@ class AverageRatingResponse(BaseModel):
     average_rating: float
 
 
+class RatingResponse(BaseModel):
+    average_rating: float | None
+    image_url: str
+
+
 class RatingBase(BaseModel):
     rate: int
 
