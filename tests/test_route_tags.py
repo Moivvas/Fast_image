@@ -36,10 +36,10 @@ def test_create_tag(client, token):
 
 def test_get_tag_by_id(client, token):
     with patch.object(auth_service, "redis_db") as redis_mock:
-        redis_mock.get.return_value = None
+        redis_mock.get.return_value = None\
 
         response = client.get(
-            "/project/tags/1",
+            "/project/tags/by_id/1",
             headers={"Authorization": f"Bearer {token}"}
         )
         assert response.status_code == 200, response.text
@@ -53,7 +53,7 @@ def test_get_tag_by_id_not_found(client, token):
         redis_mock.get.return_value = None
 
         response = client.get(
-            "/project/tags/2",
+            "/project/tags/by_id/2",
             headers={"Authorization": f"Bearer {token}"}
         )
         assert response.status_code == 404, response.text
@@ -66,7 +66,7 @@ def test_get_tag_by_name(client, token):
         redis_mock.get.return_value = None
 
         response = client.get(
-            "/project/tags/1",
+            "/project/tags/by_name/test_tag",
             headers={"Authorization": f"Bearer {token}"}
         )
         assert response.status_code == 200, response.text
@@ -80,7 +80,7 @@ def test_get_tag_by_name_not_found(client, token):
         redis_mock.get.return_value = None
 
         response = client.get(
-            "/project/tags/2",
+            "/project/tags/by_name/tag",
             headers={"Authorization": f"Bearer {token}"}
         )
         assert response.status_code == 404, response.text
