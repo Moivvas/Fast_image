@@ -10,7 +10,7 @@ from src.database.models import Role
 
 
 class UserModel(BaseModel):
-    name: str
+    name: str = Field(min_length=2, max_length=20)
     email: EmailStr
     sex: str
     password: str = Field(min_length=6, max_length=16)
