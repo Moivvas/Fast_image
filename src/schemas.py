@@ -114,9 +114,7 @@ class RatingModel(RatingBase):
     id: int
     image_id: int
     user_id: int
-
-    class Config:
-        from_attributes = True
+    model_config = SettingsConfigDict(from_attributes=True)
 
 
 class AverageRatingResponse(BaseModel):
