@@ -1,7 +1,9 @@
 from typing import Type
+from fastapi import HTTPException, status
 
 from sqlalchemy.orm import Session, joinedload
 from src.database.models import User, Image
+from src.conf import messages
 from src.schemas import (
     UserModel,
     ChangeRoleRequest,
@@ -15,6 +17,7 @@ from src.schemas import (
     AllUsersProfiles,
 )
 from src.repository import ratings as repository_rating
+from src.services.auth import auth_service
 
 async def get_users(db: Session) -> list[Type[User]]:
     users = db.query(User).all()
@@ -162,3 +165,55 @@ async def get_users_profiles(db: Session, current_user: User):
         users_profiles.append(user_profile)
     all_users_profiles = AllUsersProfiles(users=users_profiles)
     return all_users_profiles
+
+
+async def update_user_profile_me_info(
+    user_id: int,
+    new_name: str | None,
+    db: Session,
+    current_user: User,
+) -> User:
+    
+    user = await get_user_by_id(user_id, db)
+
+    if user.id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=messages.NOT_AUTHORIZED_ACCESS)
+
+    if new_name:
+        user.name = new_name
+
+    db.commit()
+    db.refresh(user)
+
+    return user
+
+
+async def update_user_profile_me_credential(
+    user_id: int,
+    new_email: str | None,
+    new_password: str | None,
+    db: Session,
+    current_user: User,
+) -> User:
+    
+    user = await get_user_by_id(user_id, db)
+
+    if user.id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=messages.NOT_AUTHORIZED_ACCESS)
+
+    try:
+        if new_email and new_email != user.email:
+            existing_user = await get_user_by_email(new_email, db)
+            if existing_user:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=messages.EMAIL_ALREADY_EXISTS)
+            user.email = new_email
+
+        if new_password:
+            user.password = auth_service.get_password_hash(new_password)
+        
+        db.commit()
+        db.refresh(user)
+        return user
+
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=str(e))

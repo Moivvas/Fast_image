@@ -97,3 +97,41 @@ def test_get_user_profile(session, user, client, token):
         assert payload["user"]["email"] == "deadpool@example.com"
         assert payload["user"]["name"] == "deadpool"
         assert type(payload["images"]) == list
+
+        
+def test_update_user_info(user, session, client, token):
+    with patch.object(auth_service, "redis_db") as redis_mock:
+        redis_mock.get.return_value = None
+
+        client.post("/project/auth/signup", json={"name": "John", "email": "john@example.com", "password": "password", "sex": "male"})
+        response_login = client.post("/project/auth/login", data={"username": "john@example.com", "password": "password"})
+        token_john = response_login.json()["access_token"]
+
+        new_name = "Johnny"
+        response_update = client.patch(
+            "/project/users/me/info?new_name=Johnny",
+            json={"new_name": new_name},
+            headers={"Authorization": f"Bearer {token_john}"},
+        )
+
+        assert response_update.status_code == 200, response_update.text
+        payload = response_update.json()
+        assert payload["name"] == new_name
+
+
+def test_update_user_credential(user, session, client, token):
+    with patch.object(auth_service, "redis_db") as redis_mock:
+        redis_mock.get.return_value = None
+
+        new_email = "new_email@example.com"
+        new_password = "new_password"
+
+        response_update = client.patch(
+            "/project/users/me/credential?new_email=new_email%40example.com&new_password=new_password",
+            json={"new_email": new_email, "new_password": new_password},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+        assert response_update.status_code == 200, response_update.text
+        payload = response_update.json()
+        assert payload["email"] == new_email
