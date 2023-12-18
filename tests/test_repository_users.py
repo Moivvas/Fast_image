@@ -73,14 +73,13 @@ class TestUsersRepository(unittest.IsolatedAsyncioTestCase):
             )
             self.assertEqual(result.name, new_name)
 
-
-async def test_update_user_profile_me_credential(self):
+    async def test_update_user_profile_me_credential(self):
         new_email = "new_email@example.com"
         new_password = "new_password"
 
-        with patch("src.repository.repository_users.get_user_by_id") as mock_get_user_by_id, \
-             patch("src.repository.repository_users.get_user_by_email") as mock_get_user_by_email, \
-             patch("src.routes.auth_service.get_password_hash") as mock_get_password_hash:
+        with patch("src.repository.users.get_user_by_id") as mock_get_user_by_id, \
+             patch("src.repository.users.get_user_by_email") as mock_get_user_by_email, \
+             patch("src.services.auth.auth_service.get_password_hash") as mock_get_password_hash:
 
             mock_get_user_by_id.return_value = self.user
             mock_get_user_by_email.return_value = None
