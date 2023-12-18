@@ -1,5 +1,3 @@
-from operator import or_
-
 from fastapi import HTTPException, status
 from sqlalchemy import func, desc
 from sqlalchemy.orm import Session

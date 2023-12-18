@@ -10,7 +10,7 @@ from typing import List, Type
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
-from src.database.models import Tag
+from src.database.models import Tag,User
 from src.schemas import TagModel
 from src.repository.tags import (
     create_tag, 
@@ -34,7 +34,7 @@ class TestTag(unittest.TestCase):
         result = await create_tag(body, self.session)
         self.assertEqual(result, self.tag_1)
 
-    async def test_get_tag_by_id_succsess(self):
+    async def test_get_tag_by_id_success(self):
         tag_id = 1
         tag_name = self.tag_1.tag_name
         expected_tag = Tag(tag_id, tag_name)
@@ -49,7 +49,7 @@ class TestTag(unittest.TestCase):
         with self.assertRaises(HTTPException) as exc:
             await get_tag_by_id(self.tag_1.id, self.session)
 
-    async def test_get_tag_by_name_succsess(self):
+    async def test_get_tag_by_name_success(self):
         tag_id = 1
         tag_name = self.tag_1.tag_name
         expected_tag = Tag(tag_id, tag_name)
@@ -64,7 +64,7 @@ class TestTag(unittest.TestCase):
         with self.assertRaises(HTTPException) as exc:
             await get_tag_by_name(self.tag_1.tag_name, self.session)
 
-    async def test_get_tags_succsess(self):
+    async def test_get_tags_success(self):
         tags = [self.tag_1, self.tag_2]
         self.session.query(Tag).filter_by().all.return_value = tags
         result = await get_tags(self.session)
