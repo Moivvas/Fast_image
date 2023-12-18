@@ -12,6 +12,7 @@ async def get_comments(db: Session):
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=messages.NO_COMMENTS)
 
+
 async def get_comments_for_photo(image_id, db: Session):
     try:
         return db.query(Comment).filter_by(image_id=image_id).all()
