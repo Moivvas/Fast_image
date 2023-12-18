@@ -39,7 +39,6 @@ async def upload_image(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
-    
 
     public_id = CloudImage.generate_name_image(current_user.email)
     upload_file = CloudImage.upload_image(
@@ -50,7 +49,6 @@ async def upload_image(
     )
     return image
     
-
 
 @router.delete(
     "/{id}", response_model=ImageDeleteResponse, dependencies=[Depends(all_roles)]
@@ -139,7 +137,7 @@ async def search_images(
     current_user: User = Depends(auth_service.get_current_user),
     keyword: str = Query(default=None),
     tag: str = Query(default=None),
-    min_rating = Query(default=None),
+    min_rating: int = Query(default=None),
 ):
     try:
         all_images = await get_all_images(db, current_user, keyword, tag, min_rating)
@@ -148,7 +146,7 @@ async def search_images(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.patch("/", response_model= AddTag, dependencies=[Depends(all_roles)])
+@router.patch("/", response_model=AddTag, dependencies=[Depends(all_roles)])
 async def add_tag(
     image_id: int,
     tag: str,
