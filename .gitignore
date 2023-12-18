@@ -1,0 +1,7 @@
+.env
+__pycache__
+*/__pycache__
+test.db
+.pytest_cache
+.idea
+.vscode
