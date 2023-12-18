@@ -36,6 +36,7 @@ async def update_comment(body: CommentModel, db: Session, current_user: User):
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=messages.CANT_CHANGE_COMMENT)
 
+
 async def remove_comment(comment_id, db: Session):
     comment = await get_comment_by_id(comment_id, db)
     if comment:

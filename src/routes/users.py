@@ -133,3 +133,36 @@ async def update_user_credential(
         current_user=current_user,
     )
     return updated_user
+
+
+@router.patch(
+    "/ban_user", response_model=UserResponse, dependencies=[Depends(only_admin)]
+)
+async def ban_user(
+    email: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth_service.get_current_user),
+):
+    forbidden_user = await repository_users.ban_user(email, db)
+    if not forbidden_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.USER_NOT_FOUND
+        )
+    return forbidden_user
+
+
+@router.patch(
+    "/unban_user", response_model=UserResponse, dependencies=[Depends(only_admin)]
+)
+async def unban_user(
+    email: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth_service.get_current_user),
+):
+    forbidden_user = await repository_users.unban_user(email, db)
+    if not forbidden_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.USER_NOT_FOUND
+        )
+    return forbidden_user
+

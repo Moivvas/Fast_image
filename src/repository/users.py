@@ -7,7 +7,6 @@ from src.conf import messages
 from src.schemas import (
     UserModel,
     ChangeRoleRequest,
-    UserResponse,
     CommentByUser,
     ImageProfile,
     UserProfile,
@@ -99,7 +98,10 @@ async def change_user_role(body: ChangeRoleRequest, db: Session) -> User | None:
 async def get_user_profile_by_name(user_name: str, db: Session, current_user: User):
 
     user = await get_user_by_name(user_name, db)
-
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=messages.USER_NOT_FOUND
+        )
     user_data = UserInfoProfile(
         id=user.id,
         name=user.name,
