@@ -31,9 +31,17 @@ BASE_DIR = pathlib.Path(__file__).parent
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 
-@app.get("/", response_class=HTMLResponse, description="Main Page")
+@app.get("/index.html", response_class=HTMLResponse, description="Main Page")
 async def root(request: Request):
     return templates.TemplateResponse('index.html', {"request": request, "title": "FAST_image_App"})
+
+@app.get("/team.html", response_class=HTMLResponse, description="Team Page")
+async def team(request: Request):
+    return templates.TemplateResponse('team.html', {"request": request, "title": "Team - FAST_image_App"})
+
+@app.get("/features.html", response_class=HTMLResponse, description="Features")
+async def feature(request: Request):
+    return templates.TemplateResponse('features.html', {"request": request, "title": "Features - FAST_image_App"})
 
 
 app.include_router(auth.router, prefix='/project')
