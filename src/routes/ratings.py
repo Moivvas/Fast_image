@@ -22,7 +22,7 @@ rates_by_user = RoleAccess([Role.admin, Role.moderator, Role.user])
 search_user_with_images = RoleAccess([Role.admin, Role.moderator])
 
 
-@router.post('/images/{image_id}/{rate}', response_model=RatingModel, dependencies=[Depends(create_ratings)])
+@router.post('/{image_id}/{rate}', response_model=RatingModel, dependencies=[Depends(create_ratings)])
 async def create_rate(image_id: int,
                       rate: int = Path(description='From one to five stars', ge=1, le=5),
                       db: Session = Depends(get_db),
@@ -33,18 +33,6 @@ async def create_rate(image_id: int,
     return new_rate
 
 
-@router.get('/average_rate/{image_id}',
-            response_model=RatingResponse,
-            dependencies=[Depends(get_all_ratings)])
-async def image_by_rating(image_id: int,
-                          db: Session = Depends(get_db),
-                          current_user: User = Depends(auth_service.get_current_user)):
-    images_by_rating = await repository_ratings.calculate_rating(image_id, db, current_user)
-    if images_by_rating is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.RATE_NOT_FOUND)
-    return images_by_rating
-
-
 @router.get('/all_my', response_model=List[RatingModel], dependencies=[Depends(rates_by_user)])
 async def all_my_rates(db: Session = Depends(get_db),
                        current_user: User = Depends(auth_service.get_current_user)):
@@ -52,6 +40,28 @@ async def all_my_rates(db: Session = Depends(get_db),
     if rates is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.RATE_NOT_FOUND)
     return rates
+
+
+@router.get('/search_user_with_images', response_model=List[ImageModel],
+            dependencies=[Depends(search_user_with_images)])
+async def search_users_with_images(db: Session = Depends(get_db),
+                                   current_user: User = Depends(auth_service.get_current_user)):
+    users_with_images = await repository_ratings.user_with_images(db, current_user)
+    if not users_with_images:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.NO_USER_WITH_IMAGES)
+    return users_with_images
+
+
+@router.get('/{image_id}',
+            response_model=RatingResponse,
+            dependencies=[Depends(get_all_ratings)])
+async def get_image_avg_rating(image_id: int,
+                          db: Session = Depends(get_db),
+                          current_user: User = Depends(auth_service.get_current_user)):
+    images_by_rating = await repository_ratings.calculate_rating(image_id, db, current_user)
+    if images_by_rating is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.RATE_NOT_FOUND)
+    return images_by_rating
 
 
 @router.get('/user_image/{user_id}/{image_id}', response_model=RatingModel, dependencies=[Depends(user_image_rate)])
@@ -75,11 +85,4 @@ async def delete_rate(rate_id: int,
     return deleted_rate
 
 
-@router.get('/search_user_with_images', response_model=List[ImageModel],
-            dependencies=[Depends(search_user_with_images)])
-async def search_users_with_images(db: Session = Depends(get_db),
-                                   current_user: User = Depends(auth_service.get_current_user)):
-    users_with_images = await repository_ratings.user_with_images(db, current_user)
-    if not users_with_images:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.NO_USER_WITH_IMAGES)
-    return users_with_images
+

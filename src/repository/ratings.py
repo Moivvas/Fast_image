@@ -51,8 +51,8 @@ async def calculate_rating(image_id: int, db: Session, user: User):
     return {'average_rating': all_ratings, 'image_url': str(image_url)}
 
 
-async def show_my_ratings(db: Session, user: User) -> list[Type[Rating]]:
-    all_ratings = db.query(Rating).filter(Rating.user_id == user.id).all()
+async def show_my_ratings(db: Session, current_user) -> list[Type[Rating]]:
+    all_ratings = db.query(Rating).filter(Rating.user_id == current_user.id).all()
     return all_ratings
 
 

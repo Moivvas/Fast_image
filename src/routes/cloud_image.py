@@ -20,7 +20,7 @@ from src.schemas import (
     ImageUpdateResponse,
     ImageURLResponse,
     ImageModel,
-    ImagesByFilter,
+    ImagesByFilter, ImageQRResponse, ImageTransformModel, ImageAddResponse, ImageChangeSizeModel,
 )
 
 
@@ -51,22 +51,22 @@ async def upload_image(
     
 
 @router.delete(
-    "/{id}", response_model=ImageDeleteResponse, dependencies=[Depends(all_roles)]
+    "/{image_id}", response_model=ImageDeleteResponse, dependencies=[Depends(all_roles)]
 )
 async def delete_image(
-    id: int,
+    image_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ):
     try:
-        image = await repository_image.get_image_by_id(db, id)
+        image = await repository_image.get_image_by_id(db, image_id)
         if not image:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND
             )
 
         if current_user.role == "admin" or image.user_id == current_user.id:
-            deleted_image = await repository_image.delete_image(db, id)
+            deleted_image = await repository_image.delete_image(db, image_id)
             return deleted_image
         else:
             raise HTTPException(
@@ -81,16 +81,16 @@ async def delete_image(
 
 
 @router.patch(
-    "/{id}", response_model=ImageUpdateResponse, dependencies=[Depends(all_roles)]
+    "/{image_id}", response_model=ImageUpdateResponse, dependencies=[Depends(all_roles)]
 )
 async def update_description(
-    id: int,
+    image_id: int,
     description: str = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ):
     try:
-        image = await repository_image.get_image_by_id(db, id)
+        image = await repository_image.get_image_by_id(db, image_id)
         if not image:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND
@@ -101,7 +101,7 @@ async def update_description(
                 status_code=status.HTTP_403_FORBIDDEN, detail=messages.NOT_ALLOWED
             )
 
-        updated_image = await repository_image.update_desc(db, id, description)
+        updated_image = await repository_image.update_desc(db, image_id, description)
         return updated_image
     except SQLAlchemyError as e:
         db.rollback()
@@ -153,11 +153,48 @@ async def add_tag(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ):
-    # try:
-    print('route before')
+
     response = await repository_image.add_tag(db, current_user, image_id, tag)
-    print('route after')
 
     return response
-    # except SQLAlchemyError as e:
-    #     raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post('/create_qr', response_model=ImageQRResponse, status_code=status.HTTP_201_CREATED)
+async def create_qr(body: ImageTransformModel,
+                    db: Session = Depends(get_db),
+                    current_user: User = Depends(auth_service.get_current_user)):
+    image = await repository_image.create_qr(body=body, db=db, user=current_user)
+    if image is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND)
+    return image
+
+
+@router.post('/change_size', response_model=ImageAddResponse, status_code=status.HTTP_201_CREATED)
+async def change_size_image(body: ImageChangeSizeModel,
+                            db: Session = Depends(get_db),
+                            current_user: User = Depends(auth_service.get_current_user)):
+    image = await repository_image.change_size_image(body=body, db=db, user=current_user)
+    if image is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND)
+    return image
+
+
+@router.post('/fade_edges', response_model=ImageAddResponse, status_code=status.HTTP_201_CREATED)
+async def fade_edges_image(body: ImageTransformModel,
+                           db: Session = Depends(get_db),
+                           current_user: User = Depends(auth_service.get_current_user)):
+    image = await repository_image.fade_edges_image(body=body, db=db, user=current_user)
+    if image is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND)
+    return image
+
+
+@router.post('/black_white', response_model=ImageAddResponse, status_code=status.HTTP_201_CREATED)
+async def black_white_image(body: ImageTransformModel,
+                            db: Session = Depends(get_db),
+                            current_user: User = Depends(auth_service.get_current_user)):
+    image = await repository_image.black_white_image(body=body, db=db, user=current_user)
+    if image is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND)
+    return image
+
