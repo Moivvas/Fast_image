@@ -35,7 +35,6 @@ NO_COMMENTS = "No such comments"
 NO_COMMENTS_ON_THIS_IMAGE = "There are no pinned comments on this photo"
 NO_COMMENTS_ON_THIS_ID = "There are no pinned comments on this ID"
 ERROR_CREATING_COMMENT = "Error creating comment"
-
 NOT_AUTHORIZED_DELETE = "Not authorized to delete this image"
 NOT_ALLOWED = "Can`t update someones picture"
 NOT_AUTHORIZED_ACCESS = "Not authorized access"
