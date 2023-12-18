@@ -73,7 +73,6 @@ class TestUsersRepository(unittest.IsolatedAsyncioTestCase):
             )
             self.assertEqual(result.name, new_name)
 
-
     async def test_update_user_profile_me_credential(self):
         new_email = "new_email@example.com"
         new_password = "new_password"
