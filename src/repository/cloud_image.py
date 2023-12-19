@@ -8,7 +8,7 @@ from src.database.models import Image, User, Tag, Rating
 
 import qrcode
 from io import BytesIO
-from src.database.models import Image, User
+
 from src.repository.tags import create_tag
 
 from src.services.cloud_images_service import CloudImage, image_cloudinary
@@ -58,7 +58,7 @@ async def update_desc(db: Session, image_id: int, description=str):
     return image
 
 
-async def get_image_by_id(db: Session, image_id: int) -> Image:
+async def get_image_by_id(db: Session, image_id: int) -> Image | None:
     image = db.query(Image).filter(Image.id == image_id).first()
     return image
 
@@ -87,7 +87,6 @@ async def change_size_image(body: ImageChangeSizeModel, db: Session, user: User)
     )
     return ImageAddResponse(image=image_model, detail=messages.IMAGE_RESIZED_ADDED)
     
-
 
 async def fade_edges_image(body: ImageTransformModel, db: Session, user: User):
     image = db.query(Image).filter(Image.id == body.id).first()
@@ -128,7 +127,6 @@ async def black_white_image(body: ImageTransformModel, db: Session, user: User):
         )
     if image.user_id != user.id:
         raise HTTPException(status_code=403, detail=messages.NOT_ALLOWED)
-    
 
     url, public_id = await image_cloudinary.make_black_white_image(
         public_id=image.public_id
@@ -203,7 +201,7 @@ async def create_qr(body: ImageTransformModel, db: Session, user: User):
             status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND
         )
     if image.qr_url:
-        return ImageQRResponse(image_id=image.id, qr_code_url="")
+        return ImageQRResponse(image_id=image.id, qr_code_url=image.qr_url)
     
     qr = qrcode.QRCode()
     qr.add_data(image.url)
