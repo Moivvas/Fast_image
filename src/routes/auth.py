@@ -66,9 +66,7 @@ async def login(
 
 
 @router.post("/logout")
-async def logout(
-    token: str = Depends(auth_service.oauth2_scheme)
-) -> JSONResponse:
+async def logout(token: str = Depends(auth_service.oauth2_scheme)) -> JSONResponse:
     await auth_service.ban_token(token)
     return JSONResponse(content={"message": "Successfully logged out"})
 
@@ -95,6 +93,3 @@ async def refresh_token(
         "refresh_token": refresh_token,
         "token_type": "bearer",
     }
-
-
-
