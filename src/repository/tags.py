@@ -48,7 +48,7 @@ async def remove_tag_by_id(tag_id: int, db: Session) -> Tag | None:
 
 async def remove_tag_by_name(tag_name: str, db: Session) -> Tag | None:
     tag = await get_tag_by_name(tag_name, db)
-    if tag: 
+    if tag:
         db.delete(tag)
         db.commit()
     return tag
