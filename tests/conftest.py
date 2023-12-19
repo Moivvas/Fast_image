@@ -68,3 +68,14 @@ def tag():
         "tag_name": "test_tag",
         "id": 1
     }
+
+@pytest.fixture(scope="module")
+def image():
+
+    return {
+        "id":123,
+        "url":"https://example.com/image.jpg",
+        "public_id":"public_id_test",
+        "user_id":456,
+        "description":"old description"
+    }
