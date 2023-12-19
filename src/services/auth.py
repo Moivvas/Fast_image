@@ -1,4 +1,3 @@
-import pickle
 import redis.asyncio as redis
 from datetime import datetime, timedelta
 from typing import Optional
@@ -48,7 +47,6 @@ class Auth:
     async def create_refresh_token(
         self, data: dict, expires_delta: Optional[float] = None
     ):
-
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.utcnow() + timedelta(seconds=expires_delta)
@@ -63,7 +61,6 @@ class Auth:
         return encoded_refresh_token
 
     async def decode_refresh_token(self, refresh_token: str):
-
         try:
             payload = jwt.decode(
                 refresh_token, self.SECRET_KEY, algorithms=[self.ALGORITHM]
@@ -93,7 +90,6 @@ class Auth:
     async def get_current_user(
         self, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
     ):
-
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=messages.COULD_NOT_VALIDATE_CREDENTIALS,
@@ -102,7 +98,10 @@ class Auth:
 
         banned_token = await self.banned_token(token)
         if banned_token:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=messages.USER_IS_NOT_AUTHORIZED)
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=messages.USER_IS_NOT_AUTHORIZED,
+            )
         try:
             payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
             if payload["scope"] == "access_token":
