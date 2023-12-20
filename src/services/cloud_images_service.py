@@ -14,7 +14,6 @@ class CloudImage:
         secure=True,
     )
 
-
     @staticmethod
     def generate_name_image(email: str) -> str:
         name = hashlib.sha256(email.encode("utf-8")).hexdigest()[:12]
@@ -37,9 +36,7 @@ class CloudImage:
         cloudinary.uploader.destroy(public_id, resource_type="image")
         return f"{public_id} deleted"
 
-
     async def change_size(self, public_id: str, width: int) -> str:
-
         img = cloudinary.CloudinaryImage(public_id).image(
             transformation=[{"width": width, "crop": "pad"}]
         )
@@ -47,14 +44,11 @@ class CloudImage:
         upload_image = cloudinary.uploader.upload(url[1], folder="fast_image")
         return upload_image["url"], upload_image["public_id"]
 
-
     async def fade_edges_image(self, public_id: str, effect: str = "vignette") -> str:
-
         img = cloudinary.CloudinaryImage(public_id).image(effect=effect)
         url = img.split('"')
         upload_image = cloudinary.uploader.upload(url[1], folder="fast_image")
         return upload_image["url"], upload_image["public_id"]
-
 
     async def make_black_white_image(
         self, public_id: str, effect: str = "art:audrey"
