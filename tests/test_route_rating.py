@@ -11,7 +11,7 @@ from src.database.models import User, Role
 from src.schemas import RatingModel, AverageRatingResponse, ImageModel
 from src.repository import ratings as repository_rating
 from src.routes.ratings import (create_rate,
-                                image_by_rating,
+                                get_image_avg_rating,
                                 all_my_rates,
                                 user_rate_image,
                                 delete_rate,
@@ -66,7 +66,7 @@ class TestImageByRating(unittest.TestCase):
         expected_response = AverageRatingResponse(average_rating=4.5, image_url="example.com/image.jpg")
         repository_ratings.calculate_rating = MagicMock(return_value=expected_response)
 
-        response = await image_by_rating(image_id, db, current_user)
+        response = await get_image_avg_rating(image_id, db, current_user)
 
         self.assertEqual(response, expected_response)
 
@@ -87,7 +87,7 @@ class TestImageByRating(unittest.TestCase):
         expected_response = AverageRatingResponse(average_rating=4.5, image_url="example.com/image.jpg")
         repository_ratings.calculate_rating = MagicMock(return_value=expected_response)
 
-        response = await image_by_rating(image_id, db, current_user)
+        response = await get_image_avg_rating(image_id, db, current_user)
 
         self.assertEqual(response, expected_response)
 

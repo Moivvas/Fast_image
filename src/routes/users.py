@@ -1,10 +1,10 @@
-from typing import Type, Union
+from typing import Union
 
 from fastapi import APIRouter, Depends, UploadFile, File, status, HTTPException
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 
 from src.conf import messages
-from src.database.models import User, Image, Comment
+from src.database.models import User
 from src.database.db import get_db
 
 from src.services.auth import auth_service
@@ -14,8 +14,6 @@ from src.schemas import (
     UserResponse,
     ChangeRoleRequest,
     UserProfile,
-    CommentByUser,
-    ImageProfile,
     ProfileMe,
     AllUsersProfiles,
 )
@@ -60,7 +58,9 @@ async def get_users_profiles(
 
 
 @router.get(
-    "/user/{email}", response_model=UserResponse, dependencies=[Depends(admin_and_moder)]
+    "/user/{email}",
+    response_model=UserResponse,
+    dependencies=[Depends(admin_and_moder)],
 )
 async def get_user(
     email: str,
@@ -103,7 +103,9 @@ async def get_user_profile(
     return user_profile
 
 
-@router.patch("/me/info", response_model=UserResponse, dependencies=[Depends(all_roles)])
+@router.patch(
+    "/me/info", response_model=UserResponse, dependencies=[Depends(all_roles)]
+)
 async def update_user_info(
     new_name: str | None = None,
     db: Session = Depends(get_db),
@@ -118,7 +120,9 @@ async def update_user_info(
     return updated_user
 
 
-@router.patch("/me/credential", response_model=UserResponse, dependencies=[Depends(all_roles)])
+@router.patch(
+    "/me/credential", response_model=UserResponse, dependencies=[Depends(all_roles)]
+)
 async def update_user_credential(
     new_email: Union[str, None] = None,
     new_password: Union[str, None] = None,
@@ -133,3 +137,35 @@ async def update_user_credential(
         current_user=current_user,
     )
     return updated_user
+
+
+@router.patch(
+    "/ban_user", response_model=UserResponse, dependencies=[Depends(only_admin)]
+)
+async def ban_user(
+    email: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth_service.get_current_user),
+):
+    forbidden_user = await repository_users.ban_user(email, db)
+    if not forbidden_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.USER_NOT_FOUND
+        )
+    return forbidden_user
+
+
+@router.patch(
+    "/unban_user", response_model=UserResponse, dependencies=[Depends(only_admin)]
+)
+async def unban_user(
+    email: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth_service.get_current_user),
+):
+    forbidden_user = await repository_users.unban_user(email, db)
+    if not forbidden_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.USER_NOT_FOUND
+        )
+    return forbidden_user

@@ -14,11 +14,9 @@ from fastapi.security import (
 from sqlalchemy.orm import Session
 
 from src.database.db import get_db
-from src.database.models import Role, User
 from src.schemas import UserModel, UserResponse, TokenModel
 from src.repository import users as repository_users
 from src.conf import messages
-from src.services.roles import only_admin
 from src.services.auth import auth_service
 
 
@@ -68,9 +66,7 @@ async def login(
 
 
 @router.post("/logout")
-async def logout(
-    token: str = Depends(auth_service.oauth2_scheme)
-) -> JSONResponse:
+async def logout(token: str = Depends(auth_service.oauth2_scheme)) -> JSONResponse:
     await auth_service.ban_token(token)
     return JSONResponse(content={"message": "Successfully logged out"})
 
@@ -97,35 +93,3 @@ async def refresh_token(
         "refresh_token": refresh_token,
         "token_type": "bearer",
     }
-
-
-@router.patch(
-    "/ban_user", response_model=UserResponse, dependencies=[Depends(only_admin)]
-)
-async def ban_user(
-    email: str,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(auth_service.get_current_user),
-):
-    forbidden_user = await repository_users.ban_user(email, db)
-    if not forbidden_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=messages.USER_NOT_FOUND
-        )
-    return forbidden_user
-
-
-@router.patch(
-    "/unban_user", response_model=UserResponse, dependencies=[Depends(only_admin)]
-)
-async def unban_user(
-    email: str,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(auth_service.get_current_user),
-):
-    forbidden_user = await repository_users.unban_user(email, db)
-    if not forbidden_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=messages.USER_NOT_FOUND
-        )
-    return forbidden_user

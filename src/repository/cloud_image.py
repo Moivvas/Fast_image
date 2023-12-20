@@ -1,5 +1,3 @@
-from operator import or_
-
 from fastapi import HTTPException, status
 from sqlalchemy import func, desc
 from sqlalchemy.orm import Session
@@ -10,7 +8,7 @@ from src.database.models import Image, User, Tag, Rating
 
 import qrcode
 from io import BytesIO
-from src.database.models import Image, User
+
 from src.repository.tags import create_tag
 
 from src.services.cloud_images_service import CloudImage, image_cloudinary
@@ -60,17 +58,17 @@ async def update_desc(db: Session, image_id: int, description=str):
     return image
 
 
-async def get_image_by_id(db: Session, image_id: int) -> Image:
+async def get_image_by_id(db: Session, image_id: int) -> Image | None:
     image = db.query(Image).filter(Image.id == image_id).first()
     return image
 
 
 async def change_size_image(body: ImageChangeSizeModel, db: Session, user: User):
-    
     image = db.query(Image).filter(Image.id == body.id).first()
     if image is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND)
+            status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND
+        )
     if image.user_id != user.id:
         raise HTTPException(status_code=403, detail=messages.NOT_ALLOWED)
 
@@ -88,7 +86,6 @@ async def change_size_image(body: ImageChangeSizeModel, db: Session, user: User)
         user_id=new_image.user_id,
     )
     return ImageAddResponse(image=image_model, detail=messages.IMAGE_RESIZED_ADDED)
-    
 
 
 async def fade_edges_image(body: ImageTransformModel, db: Session, user: User):
@@ -100,10 +97,8 @@ async def fade_edges_image(body: ImageTransformModel, db: Session, user: User):
 
     if image.user_id != user.id:
         raise HTTPException(status_code=403, detail=messages.NOT_ALLOWED)
-    
-    url, public_id = await image_cloudinary.fade_edges_image(
-        public_id=image.public_id
-    )
+
+    url, public_id = await image_cloudinary.fade_edges_image(public_id=image.public_id)
 
     new_image = Image(
         url=url, public_id=public_id, user_id=user.id, description=image.description
@@ -130,7 +125,6 @@ async def black_white_image(body: ImageTransformModel, db: Session, user: User):
         )
     if image.user_id != user.id:
         raise HTTPException(status_code=403, detail=messages.NOT_ALLOWED)
-    
 
     url, public_id = await image_cloudinary.make_black_white_image(
         public_id=image.public_id
@@ -184,7 +178,7 @@ async def get_all_images(
             new_tag = tag.tag_name
             tags.append(new_tag)
         rating = await repository_ratings.calculate_rating(image.id, db, current_user)
-        new_rating = rating['average_rating']
+        new_rating = rating["average_rating"]
         new_image = ImageProfile(
             url=image.url,
             description=image.description,
@@ -205,23 +199,20 @@ async def create_qr(body: ImageTransformModel, db: Session, user: User):
             status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND
         )
     if image.qr_url:
-        return ImageQRResponse(image_id=image.id, qr_code_url="")
-    
+        return ImageQRResponse(image_id=image.id, qr_code_url=image.qr_url)
+
     qr = qrcode.QRCode()
     qr.add_data(image.url)
     qr.make(fit=True)
 
     qr_code_img = BytesIO()
-    qr.make_image(fill_color="black", back_color="white").save(
-        qr_code_img
-    )
+    qr.make_image(fill_color="black", back_color="white").save(qr_code_img)
 
     qr_code_img.seek(0)
 
     new_public_id = CloudImage.generate_name_image(user.email)
 
-    upload_file = CloudImage.upload_image(
-        qr_code_img, new_public_id)
+    upload_file = CloudImage.upload_image(qr_code_img, new_public_id)
 
     qr_code_url = CloudImage.get_url_for_image(new_public_id, upload_file)
 
@@ -231,10 +222,8 @@ async def create_qr(body: ImageTransformModel, db: Session, user: User):
 
     return ImageQRResponse(image_id=image.id, qr_code_url=qr_code_url)
 
-    
-async def add_tag(db: Session, user: User, image_id: int, tag_name: str):
-    print('repo before db image')
 
+async def add_tag(db: Session, user: User, image_id: int, tag_name: str):
     image = db.query(Image).filter(Image.id == image_id).first()
     if image is None:
         raise HTTPException(
@@ -247,8 +236,6 @@ async def add_tag(db: Session, user: User, image_id: int, tag_name: str):
             status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=messages.ONLY_FIVE_TAGS
         )
     tag = db.query(Tag).filter(Tag.tag_name == tag_name.lower()).first()
-    print(image.tags)
-    print(type(image.tags))
 
     if tag is None:
         tag_model = TagModel(tag_name=tag_name)

@@ -19,10 +19,9 @@ class UserModel(BaseModel):
     def validate_role(cls, v):
         allowed_sex = {"male", "female"}
         if v not in allowed_sex:
-            raise ValueError(
-                f"Invalid sex. Allowed sex are: {', '.join(allowed_sex)}"
-            )
+            raise ValueError(f"Invalid sex. Allowed sex are: {', '.join(allowed_sex)}")
         return v
+
 
 class UserResponse(BaseModel):
     model_config = SettingsConfigDict(from_attributes=True)
@@ -90,7 +89,7 @@ class ImageUpdateResponse(BaseModel):
 
 class ImageURLResponse(BaseModel):
     url: str
-    
+
 
 class ImageChangeSizeModel(BaseModel):
     id: int
@@ -107,9 +106,8 @@ class ImageQRResponse(BaseModel):
 
 
 class AddTag(BaseModel):
-
     detail: str = "Image tags has been updated"
-   
+
 
 class AverageRatingResponse(BaseModel):
     average_rating: float
@@ -125,15 +123,11 @@ class RatingBase(BaseModel):
 
 
 class RatingModel(RatingBase):
+    model_config = SettingsConfigDict(from_attributes=True)
     id: int
+    rate: int
     image_id: int
     user_id: int
-    model_config = SettingsConfigDict(from_attributes=True)
-
-
-class AverageRatingResponse(BaseModel):
-    average_rating: float
-
 
 
 class CommentByUser(BaseModel):
@@ -197,7 +191,7 @@ class UserDb(BaseModel):
 
 class CommentDeleteResponse(BaseModel):
     id: int = 1
-    comment: str = 'My comment'
+    comment: str = "My comment"
 
 
 class CommentResponse(BaseModel):

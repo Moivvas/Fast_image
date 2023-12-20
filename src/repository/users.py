@@ -3,11 +3,10 @@ from fastapi import HTTPException, status
 
 from sqlalchemy.orm import Session, joinedload
 from src.database.models import User, Image
-from src.conf import messages
+from src.conf import messages, avatars
 from src.schemas import (
     UserModel,
     ChangeRoleRequest,
-    UserResponse,
     CommentByUser,
     ImageProfile,
     UserProfile,
@@ -39,16 +38,13 @@ async def get_user_by_name(user_name: str, db: Session) -> User | None:
 
 async def create_user(body: UserModel, db: Session) -> User:
     users = await get_users(db)
-    female_avatar_url = 'https://res.cloudinary.com/danwilik1/image/upload/v1702548197/fast_image/default_avatar/female_avatar_n0zwxx.jpg'
-    male_avatar_url = 'https://res.cloudinary.com/danwilik1/image/upload/v1702548197/fast_image/default_avatar/male_avatar_qjxr9h.jpg'
-    
+
     new_user = User(
-        name=body.name,
-        email=body.email,
-        sex=body.sex,
-        password=body.password
+        name=body.name, email=body.email, sex=body.sex, password=body.password
     )
-    new_user.avatar = female_avatar_url if body.sex == "female" else male_avatar_url
+    new_user.avatar = (
+        avatars.FEMALE_AVATAR if body.sex == "female" else avatars.MALE_AVATAR
+    )
     if not users:
         new_user.role = "admin"
     db.add(new_user)
@@ -64,8 +60,10 @@ async def update_token(user: User, refresh_token, db: Session) -> None:
 
 async def update_avatar(email, url: str, db: Session) -> User:
     user = await get_user_by_email(email, db)
+
     user.avatar = url
     db.commit()
+    db.refresh(user)
     return user
 
 
@@ -97,9 +95,11 @@ async def change_user_role(body: ChangeRoleRequest, db: Session) -> User | None:
 
 
 async def get_user_profile_by_name(user_name: str, db: Session, current_user: User):
-
     user = await get_user_by_name(user_name, db)
-
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=messages.USER_NOT_FOUND
+        )
     user_data = UserInfoProfile(
         id=user.id,
         name=user.name,
@@ -107,7 +107,7 @@ async def get_user_profile_by_name(user_name: str, db: Session, current_user: Us
         role=user.role,
         avatar=user.avatar,
         forbidden=user.forbidden,
-        created_at=user.created_at
+        created_at=user.created_at,
     )
     images = await get_user_images_by_id(user.id, db, current_user)
     user_profile = UserProfile(user=user_data, images=images)
@@ -137,14 +137,22 @@ async def get_user_images_by_id(user_id: int, db: Session, current_user: User):
         tags = []
         comments = []
         for comment in image.comments:
-            new_comment = CommentByUser(user_id=comment.user_id, comment=comment.comment)
+            new_comment = CommentByUser(
+                user_id=comment.user_id, comment=comment.comment
+            )
             comments.append(new_comment)
         for tag in image.tags:
             new_tag = tag.tag_name
             tags.append(new_tag)
         rating = await repository_rating.calculate_rating(image.id, db, current_user)
-        new_rating = rating['average_rating']
-        new_image = ImageProfile(url=image.url, description=image.description, average_rating=new_rating, tags=tags, comments=comments)
+        new_rating = rating["average_rating"]
+        new_image = ImageProfile(
+            url=image.url,
+            description=image.description,
+            average_rating=new_rating,
+            tags=tags,
+            comments=comments,
+        )
         images.append(new_image)
     return images
 
@@ -175,18 +183,18 @@ async def update_user_profile_me_info(
     db: Session,
     current_user: User,
 ) -> User:
-    
     user = await get_user_by_id(user_id, db)
 
     if user.id != current_user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=messages.NOT_AUTHORIZED_ACCESS)
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=messages.NOT_AUTHORIZED_ACCESS
+        )
 
     if new_name:
         user.name = new_name
 
     db.commit()
     db.refresh(user)
-
     return user
 
 
@@ -197,22 +205,26 @@ async def update_user_profile_me_credential(
     db: Session,
     current_user: User,
 ) -> User:
-    
     user = await get_user_by_id(user_id, db)
 
     if user.id != current_user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=messages.NOT_AUTHORIZED_ACCESS)
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=messages.NOT_AUTHORIZED_ACCESS
+        )
 
     try:
         if new_email and new_email != user.email:
             existing_user = await get_user_by_email(new_email, db)
             if existing_user:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=messages.EMAIL_ALREADY_EXISTS)
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=messages.EMAIL_ALREADY_EXISTS,
+                )
             user.email = new_email
 
         if new_password:
             user.password = auth_service.get_password_hash(new_password)
-        
+
         db.commit()
         db.refresh(user)
         return user
