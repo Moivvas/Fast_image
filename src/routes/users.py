@@ -29,6 +29,18 @@ async def read_users_me(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ) -> User:
+    """
+    Retrieve the profile information of the authenticated user.
+
+    This endpoint returns the profile information of the currently authenticated user.
+
+    :param current_user: The current authenticated user.
+    :type current_user: User
+    :param db: Database session.
+    :type db: Session
+    :return: The profile information of the authenticated user.
+    :rtype: ProfileMe
+    """
     user_profile = await repository_users.get_user_profile_me(db, current_user)
     return user_profile
 
@@ -39,6 +51,20 @@ async def update_avatar_user(
     current_user: User = Depends(auth_service.get_current_user),
     db: Session = Depends(get_db),
 ):
+    """
+    Update the avatar of the authenticated user.
+
+    This endpoint allows the authenticated user to update their avatar.
+
+    :param file: The avatar image file to upload.
+    :type file: UploadFile
+    :param current_user: The current authenticated user.
+    :type current_user: User
+    :param db: Database session.
+    :type db: Session
+    :return: The updated user information.
+    :rtype: UserResponse
+    """
     public_id = CloudAvatar.generate_name_avatar(current_user.email)
     r = CloudAvatar.upload_avatar(file.file, public_id)
     src_url = CloudAvatar.get_url_for_avatar(public_id, r)
@@ -53,6 +79,19 @@ async def get_users_profiles(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ) -> AllUsersProfiles:
+    """
+    Get profiles of all users.
+
+    This endpoint retrieves profiles of all users in the system. It requires
+    admin or moderator privileges.
+
+    :param db: Database session.
+    :type db: Session
+    :param current_user: The current authenticated user.
+    :type current_user: User
+    :return: Profiles of all users.
+    :rtype: AllUsersProfiles
+    """
     users = await repository_users.get_users_profiles(db, current_user)
     return users
 
@@ -67,6 +106,21 @@ async def get_user(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ) -> User:
+    """
+    Get user by email.
+
+    This endpoint retrieves a user by their email address. It requires
+    admin or moderator privileges.
+
+    :param email: The email address of the user to retrieve.
+    :type email: str
+    :param db: Database session.
+    :type db: Session
+    :param current_user: The current authenticated user.
+    :type current_user: User
+    :return: User information.
+    :rtype: UserResponse
+    """
     user = await repository_users.get_user_by_email(email, db)
     if user is None:
         raise HTTPException(
@@ -81,6 +135,20 @@ async def change_user_role(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ) -> User:
+    """
+    Change user role.
+
+    This endpoint allows an admin to change the role of a user.
+
+    :param body: Request body containing user email and new role.
+    :type body: ChangeRoleRequest
+    :param db: Database session.
+    :type db: Session
+    :param current_user: The current authenticated user.
+    :type current_user: User
+    :return: User information with updated role.
+    :rtype: UserResponse
+    """
     user = await repository_users.change_user_role(body, db)
     if user is None:
         raise HTTPException(
@@ -97,6 +165,20 @@ async def get_user_profile(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ):
+    """
+    Get user profile by username.
+
+    This endpoint retrieves the profile information of a user by their username.
+
+    :param user_name: Username of the user.
+    :type user_name: str
+    :param db: Database session.
+    :type db: Session
+    :param current_user: The current authenticated user.
+    :type current_user: User
+    :return: User profile information.
+    :rtype: UserProfile
+    """
     user_profile = await repository_users.get_user_profile_by_name(
         user_name, db, current_user
     )
@@ -111,6 +193,20 @@ async def update_user_info(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ):
+    """
+    Update user information.
+
+    This endpoint allows the authenticated user to update their profile information.
+
+    :param new_name: New name for the user.
+    :type new_name: str | None
+    :param db: Database session.
+    :type db: Session
+    :param current_user: The current authenticated user.
+    :type current_user: User
+    :return: Updated user information.
+    :rtype: UserResponse
+    """
     updated_user = await repository_users.update_user_profile_me_info(
         user_id=current_user.id,
         new_name=new_name,
@@ -129,6 +225,22 @@ async def update_user_credential(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ):
+    """
+    Update user credentials.
+
+    This endpoint allows the authenticated user to update their email or password.
+
+    :param new_email: New email for the user.
+    :type new_email: Union[str, None]
+    :param new_password: New password for the user.
+    :type new_password: Union[str, None]
+    :param db: Database session.
+    :type db: Session
+    :param current_user: The current authenticated user.
+    :type current_user: User
+    :return: Updated user information.
+    :rtype: UserResponse
+    """
     updated_user = await repository_users.update_user_profile_me_credential(
         user_id=current_user.id,
         new_email=new_email,
@@ -147,6 +259,20 @@ async def ban_user(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ):
+    """
+    Ban a user.
+
+    This endpoint allows an administrator to ban a user by email.
+
+    :param email: Email of the user to be banned.
+    :type email: str
+    :param db: Database session.
+    :type db: Session
+    :param current_user: The current authenticated user (admin).
+    :type current_user: User
+    :return: Banned user information.
+    :rtype: UserResponse
+    """
     forbidden_user = await repository_users.ban_user(email, db)
     if not forbidden_user:
         raise HTTPException(
@@ -163,6 +289,20 @@ async def unban_user(
     db: Session = Depends(get_db),
     current_user: User = Depends(auth_service.get_current_user),
 ):
+    """
+    Unban a user.
+
+    This endpoint allows an administrator to unban a user by email.
+
+    :param email: Email of the user to be unbanned.
+    :type email: str
+    :param db: Database session.
+    :type db: Session
+    :param current_user: The current authenticated user (admin).
+    :type current_user: User
+    :return: Unbanned user information.
+    :rtype: UserResponse
+    """
     forbidden_user = await repository_users.unban_user(email, db)
     if not forbidden_user:
         raise HTTPException(
