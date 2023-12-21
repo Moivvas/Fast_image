@@ -27,12 +27,12 @@ app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 @app.get("/", response_class=HTMLResponse, description="Main Page")
 async def root(request: Request):
     return templates.TemplateResponse(
-        "index.html", {"request": request, "title": "FAST_image_App"}
+        "index.html", {"request": request, "title": "Fast Image"}
     )
 
 @app.get("/index.html", response_class=HTMLResponse, description="Main Page")
 async def main(request: Request):
-    return templates.TemplateResponse('index.html', {"request": request, "title": "FAST_image_App"})
+    return templates.TemplateResponse('index.html', {"request": request, "title": "Fast Image"})
 
 @app.get("/team.html", response_class=HTMLResponse, description="Team Page")
 async def team(request: Request):
