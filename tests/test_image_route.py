@@ -22,7 +22,7 @@ def test_upload_image(client, token):
 
         cloudinary_mock = MagicMock(return_value={'secure_url': 'https://example.com/image.jpg'})
         with patch('cloudinary.uploader.upload', cloudinary_mock):
-            image_path = "image_test.png"
+            image_path = "./static/pictures/image_test.png"
             with open(image_path, "rb") as image_file:
                 files = {"file": (image_path, image_file)}
 
